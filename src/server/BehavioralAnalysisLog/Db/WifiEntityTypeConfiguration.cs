@@ -4,11 +4,11 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace BehavioralAnalysisLog.Db
 {
-    public class RawEntityTypeConfiguration : IEntityTypeConfiguration<RawLog>
+    public class WifiEntityTypeConfiguration : IEntityTypeConfiguration<Wifi>
     {
-        public void Configure(EntityTypeBuilder<RawLog> builder)
+        public void Configure(EntityTypeBuilder<Wifi> builder)
         {
-            builder.ToTable("Raw");
+            builder.ToTable("Wifi");
             builder.HasKey(x => x.Id);
         }
     }

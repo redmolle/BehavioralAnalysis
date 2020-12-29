@@ -15,7 +15,7 @@ import java.sql.PreparedStatement;
 import java.util.Timer;
 import java.util.TimerTask;
 
-public class Mics {
+public class Microphones {
     private static MediaRecorder recorder;
     private static File file = null;
     private static final String tag = "MediaRecording";

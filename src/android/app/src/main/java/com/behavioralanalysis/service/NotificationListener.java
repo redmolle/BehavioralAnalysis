@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.os.IBinder;
 import android.service.notification.NotificationListenerService;
 import android.service.notification.StatusBarNotification;
+import android.widget.Toast;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -34,7 +35,7 @@ public class NotificationListener extends NotificationListenerService {
             data.put("content", "" + content);
             data.put("postTime", postTime);
             data.put("key", uniqueKey);
-            Sender.send(data);
+            Sender.sendNotification(data);
         } catch (JSONException e) {
             e.printStackTrace();
         }

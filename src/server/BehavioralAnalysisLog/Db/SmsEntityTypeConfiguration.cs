@@ -4,11 +4,11 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace BehavioralAnalysisLog.Db
 {
-    public class RawEntityTypeConfiguration : IEntityTypeConfiguration<RawLog>
+    public class SmsEntityTypeConfiguration : IEntityTypeConfiguration<Sms>
     {
-        public void Configure(EntityTypeBuilder<RawLog> builder)
+        public void Configure(EntityTypeBuilder<Sms> builder)
         {
-            builder.ToTable("Raw");
+            builder.ToTable("Sms");
             builder.HasKey(x => x.Id);
         }
     }

@@ -7,6 +7,7 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.widget.Toast;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -23,10 +24,6 @@ public class Locations implements LocationListener {
     private double altitude;
     private float speed;
 
-    private static final long MIN_DISTANCE_CHANGE_FOR_UPDATES = 10;
-
-    private static final long MIN_TIME_BW_UPDATES = 1000 * 60 * 1;
-
     protected LocationManager locationManager;
 
     public Locations() {
@@ -35,10 +32,14 @@ public class Locations implements LocationListener {
 
     public Locations(Context context) {
         this.context = context;
-        get();
+        update();
     }
 
-    public android.location.Location get() {
+    public boolean isCanGetLocation() {
+        return canGetLocation;
+    }
+
+    public android.location.Location update() {
         try {
             locationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
             isGPSEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
@@ -71,28 +72,24 @@ public class Locations implements LocationListener {
         return location;
     }
 
-    public boolean isCanGetLocation() {
-        return canGetLocation;
-    }
 
-    public JSONObject getData() {
-        JSONObject result = null;
+    public JSONObject get() {
+        JSONObject object = new JSONObject();
 
         if (location != null) {
             try {
-                result = new JSONObject();
-                result.put("enabled", true);
-                result.put("latitude", latitude);
-                result.put("longitude", longitude);
-                result.put("altitude", altitude);
-                result.put("accuracy", accuracy);
-                result.put("speed", speed);
+                object.put("enabled", true);
+                object.put("latitude", latitude);
+                object.put("longitude", longitude);
+                object.put("altitude", altitude);
+                object.put("accuracy", accuracy);
+                object.put("speed", speed);
             } catch (JSONException e) {
 
             }
         }
 
-        return result;
+        return object;
     }
 
     @Override
@@ -104,8 +101,6 @@ public class Locations implements LocationListener {
             accuracy = location.getAccuracy();
             speed = location.getSpeed();
         }
-
-        Sender.send(getData());
     }
 
     @Override

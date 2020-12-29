@@ -4,11 +4,11 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace BehavioralAnalysisLog.Db
 {
-    public class RawEntityTypeConfiguration : IEntityTypeConfiguration<RawLog>
+    public class LocationEntityTypeConfiguration : IEntityTypeConfiguration<Location>
     {
-        public void Configure(EntityTypeBuilder<RawLog> builder)
+        public void Configure(EntityTypeBuilder<Location> builder)
         {
-            builder.ToTable("Raw");
+            builder.ToTable("Location");
             builder.HasKey(x => x.Id);
         }
     }

@@ -3,15 +3,17 @@ using System;
 using BehavioralAnalysisLog.Db;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 namespace BehavioralAnalysisLog.Migrations
 {
     [DbContext(typeof(LogContext))]
-    partial class LogContextModelSnapshot : ModelSnapshot
+    [Migration("20201229222935_New-Tables")]
+    partial class NewTables
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -28,14 +30,8 @@ namespace BehavioralAnalysisLog.Migrations
                     b.Property<string>("AppName")
                         .HasColumnType("text");
 
-                    b.Property<DateTime>("Created")
-                        .HasColumnType("timestamp without time zone");
-
                     b.Property<string>("PackageName")
                         .HasColumnType("text");
-
-                    b.Property<DateTime>("Updated")
-                        .HasColumnType("timestamp without time zone");
 
                     b.Property<string>("VersionCode")
                         .HasColumnType("text");
@@ -54,9 +50,6 @@ namespace BehavioralAnalysisLog.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<DateTime>("Created")
-                        .HasColumnType("timestamp without time zone");
-
                     b.Property<string>("Date")
                         .HasColumnType("text");
 
@@ -72,9 +65,6 @@ namespace BehavioralAnalysisLog.Migrations
                     b.Property<int>("Type")
                         .HasColumnType("integer");
 
-                    b.Property<DateTime>("Updated")
-                        .HasColumnType("timestamp without time zone");
-
                     b.HasKey("Id");
 
                     b.ToTable("Call");
@@ -86,17 +76,11 @@ namespace BehavioralAnalysisLog.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<DateTime>("Created")
-                        .HasColumnType("timestamp without time zone");
-
                     b.Property<string>("Name")
                         .HasColumnType("text");
 
                     b.Property<string>("Number")
                         .HasColumnType("text");
-
-                    b.Property<DateTime>("Updated")
-                        .HasColumnType("timestamp without time zone");
 
                     b.HasKey("Id");
 
@@ -115,9 +99,6 @@ namespace BehavioralAnalysisLog.Migrations
                     b.Property<double>("Altitude")
                         .HasColumnType("double precision");
 
-                    b.Property<DateTime>("Created")
-                        .HasColumnType("timestamp without time zone");
-
                     b.Property<bool>("Enabled")
                         .HasColumnType("boolean");
 
@@ -129,9 +110,6 @@ namespace BehavioralAnalysisLog.Migrations
 
                     b.Property<double>("Speed")
                         .HasColumnType("double precision");
-
-                    b.Property<DateTime>("Updated")
-                        .HasColumnType("timestamp without time zone");
 
                     b.HasKey("Id");
 
@@ -147,9 +125,6 @@ namespace BehavioralAnalysisLog.Migrations
                     b.Property<string>("AppName")
                         .HasColumnType("text");
 
-                    b.Property<DateTime>("Created")
-                        .HasColumnType("timestamp without time zone");
-
                     b.Property<string>("Key")
                         .HasColumnType("text");
 
@@ -158,9 +133,6 @@ namespace BehavioralAnalysisLog.Migrations
 
                     b.Property<string>("Title")
                         .HasColumnType("text");
-
-                    b.Property<DateTime>("Updated")
-                        .HasColumnType("timestamp without time zone");
 
                     b.Property<string>("content")
                         .HasColumnType("text");
@@ -176,14 +148,8 @@ namespace BehavioralAnalysisLog.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<DateTime>("Created")
-                        .HasColumnType("timestamp without time zone");
-
                     b.Property<int>("Type")
                         .HasColumnType("integer");
-
-                    b.Property<DateTime>("Updated")
-                        .HasColumnType("timestamp without time zone");
 
                     b.Property<string>("Value")
                         .HasColumnType("text");
@@ -205,17 +171,11 @@ namespace BehavioralAnalysisLog.Migrations
                     b.Property<string>("Body")
                         .HasColumnType("text");
 
-                    b.Property<DateTime>("Created")
-                        .HasColumnType("timestamp without time zone");
-
                     b.Property<string>("Read")
                         .HasColumnType("text");
 
                     b.Property<string>("Type")
                         .HasColumnType("text");
-
-                    b.Property<DateTime>("Updated")
-                        .HasColumnType("timestamp without time zone");
 
                     b.HasKey("Id");
 
@@ -231,14 +191,8 @@ namespace BehavioralAnalysisLog.Migrations
                     b.Property<string>("BSSID")
                         .HasColumnType("text");
 
-                    b.Property<DateTime>("Created")
-                        .HasColumnType("timestamp without time zone");
-
                     b.Property<string>("SSID")
                         .HasColumnType("text");
-
-                    b.Property<DateTime>("Updated")
-                        .HasColumnType("timestamp without time zone");
 
                     b.HasKey("Id");
 

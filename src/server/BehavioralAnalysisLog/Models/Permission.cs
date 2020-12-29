@@ -5,10 +5,7 @@ using System.Threading.Tasks;
 
 namespace BehavioralAnalysisLog.Models
 {
-    public class Raw
+    public class Permission : BaseEntity
     {
-        public Guid Id { get; set; }
-
-        public string Value { get; set; }
     }
 }
