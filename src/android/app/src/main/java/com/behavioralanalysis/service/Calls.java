@@ -3,7 +3,6 @@ package com.behavioralanalysis.service;
 import android.database.Cursor;
 import android.net.Uri;
 import android.provider.CallLog;
-import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONException;

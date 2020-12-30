@@ -2,7 +2,6 @@ package com.behavioralanalysis.service;
 
 import android.content.Context;
 import android.content.pm.PackageInfo;
-import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONException;

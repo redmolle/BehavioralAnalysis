@@ -3,8 +3,6 @@ package com.behavioralanalysis.service;
 import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
-import android.telephony.SmsManager;
-import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONException;

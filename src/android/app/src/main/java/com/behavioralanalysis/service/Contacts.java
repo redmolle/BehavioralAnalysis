@@ -2,7 +2,6 @@ package com.behavioralanalysis.service;
 
 import android.database.Cursor;
 import android.provider.ContactsContract;
-import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONException;
