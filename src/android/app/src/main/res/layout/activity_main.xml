@@ -9,13 +9,17 @@
     android:padding="16dp"
     tools:context="com.behavioralanalysis.service.MainActivity">
     <Button
+        android:id="@+id/startService"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:onClick="startService"
-        android:text="Start Service" />
+        android:onClick="startServiceClick"
+        android:text="Start Service"
+        android:enabled="true"/>
     <Button
+        android:id="@+id/stopService"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:onClick="stopService"
-        android:text="Stop Service" />
+        android:onClick="stopServiceClick"
+        android:text="Stop Service"
+        android:enabled="false"/>
 </LinearLayout>

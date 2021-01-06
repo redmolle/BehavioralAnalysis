@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -83,7 +84,6 @@ namespace server.Controllers.Account
         }
 
         [HttpPost("refresh-token")]
-        [Authorize]
         public async Task<ActionResult> RefreshToken([FromBody] RefreshTokenRequest request)
         {
             try
@@ -97,6 +97,17 @@ namespace server.Controllers.Account
                 }
 
                 var accessToken = await HttpContext.GetTokenAsync("Bearer", "access_token");
+                if (string.IsNullOrWhiteSpace(accessToken) &&
+                    Request.Headers.TryGetValue("Authorization", out var tmp))
+                {
+                    var token = tmp.ToString();
+                    if (token.StartsWith(JwtBearerDefaults.AuthenticationScheme))
+                    {
+                        var length = JwtBearerDefaults.AuthenticationScheme.Length + 1;
+                        accessToken = token.Substring(length, token.Length - length);
+                    }
+                }
+
                 var jwtResult = _jwtAuthService.Refresh(request.RefreshToken, accessToken, DateTime.Now);
                 _logger.LogInformation($"User [{userName}] has refreshed JWT token.");
                 return Ok(new LoginResult

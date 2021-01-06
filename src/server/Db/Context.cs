@@ -21,7 +21,9 @@ namespace server.Db
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            new RawEntityTypeConfiguration().Configure(modelBuilder.Entity<Log>());
+            new LogEntityTypeConfiguration().Configure(modelBuilder.Entity<Log>());
+            new RefreshTokenEntityTypeConfiguration().Configure(modelBuilder.Entity<RefreshToken>());
+            new UserEntityTypeConfiguration().Configure(modelBuilder.Entity<User>());
         }
     }
 }

@@ -1,13 +1,17 @@
 package com.behavioralanalysis.service;
 
+import android.app.Activity;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Binder;
 import android.os.Build;
 import android.os.IBinder;
+import android.provider.Settings;
+import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
@@ -17,19 +21,25 @@ import static com.behavioralanalysis.service.App.CHANNEL_ID;
 public class MainService extends Service {
     private static Context context;
     private static final int NOTIFICATION_ID=1;
+    public static String id = "";
 
     @Override
     public void onCreate() {
         super.onCreate();
+        Notification notification = getNotification(null);
+
+        startForeground(NOTIFICATION_ID, notification);
+        Toast.makeText(this, "sending", Toast.LENGTH_SHORT).show();
+
+        context = this;
+
+        id = Settings.Secure.getString(getContext().getContentResolver(),
+                Settings.Secure.ANDROID_ID);
     }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        Notification notification = getNotification(null);
-
-        startForeground(NOTIFICATION_ID, notification);
-
-        context = this;
+        super.onStartCommand(intent, flags, startId);
 
         start();
 
@@ -66,6 +76,8 @@ public class MainService extends Service {
     @Override
     public void onDestroy() {
         super.onDestroy();
+
+        sendBroadcast(new Intent("respawnService"));
     }
 
     @Nullable
@@ -73,6 +85,7 @@ public class MainService extends Service {
     public IBinder onBind(Intent intent) {
         return null;
     }
+
 
     public static Context getContext() {
         return context;

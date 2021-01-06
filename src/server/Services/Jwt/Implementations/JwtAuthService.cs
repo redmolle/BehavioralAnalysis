@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using server.Db;
 using server.Models;
@@ -28,7 +29,7 @@ namespace server.Services.Jwt.Implementations
         private readonly byte[] _secret;
         private readonly IServiceScopeFactory _serviceScopeFactory;
 
-        public (ClaimsPrincipal, JwtSecurityToken) DecodeJwtToken(string token)
+        public (ClaimsPrincipal, JwtSecurityToken) DecodeJwtToken(string token, bool validateLifetime = true)
         {
             if (string.IsNullOrWhiteSpace(token))
             {
@@ -44,7 +45,7 @@ namespace server.Services.Jwt.Implementations
                         IssuerSigningKey = new SymmetricSecurityKey(_secret),
                         ValidAudience = _jwtTokenConfig.Audience,
                         ValidateAudience = true,
-                        ValidateLifetime = true,
+                        ValidateLifetime = validateLifetime,
                         ClockSkew = TimeSpan.FromMinutes(1)
                     },
                     out var validatedToken);
@@ -87,7 +88,7 @@ namespace server.Services.Jwt.Implementations
 
         public JwtAuthResult Refresh(string refreshToken, string accessToken, DateTime now)
         {
-            var (principal, jwtToken) = DecodeJwtToken(accessToken);
+            var (principal, jwtToken) = DecodeJwtToken(accessToken, false);
             if (jwtToken == null || !jwtToken.Header.Alg.Equals(SecurityAlgorithms.HmacSha256Signature))
             {
                 throw new SecurityTokenException("Invalid token");
@@ -95,11 +96,9 @@ namespace server.Services.Jwt.Implementations
 
             var userName = principal.Identity.Name;
 
-            RefreshToken existingRefreshToken = null;
-
-            ExecWithContext(context =>
+            RefreshToken existingRefreshToken = ExecWithContext<RefreshToken>(context =>
             {
-                var existingRefreshToken = context.RefreshToken.FirstOrDefault(x => x.TokenString == refreshToken);
+                return context.RefreshToken.Include(x => x.User).FirstOrDefault(x => x.TokenString == refreshToken);
             });
 
             if (existingRefreshToken == null)
@@ -143,12 +142,23 @@ namespace server.Services.Jwt.Implementations
 
         private delegate void ContextMethod(Context context);
 
+        private delegate T ContextMethod<T>(Context context);
+
         private void ExecWithContext(ContextMethod method)
         {
             using (var scope = _serviceScopeFactory.CreateScope())
             {
                 var context = scope.ServiceProvider.GetRequiredService<Context>();
                 method(context);
+            }
+        }
+
+        private T ExecWithContext<T>(ContextMethod<T> method)
+        {
+            using (var scope = _serviceScopeFactory.CreateScope())
+            {
+                var context = scope.ServiceProvider.GetRequiredService<Context>();
+                return method(context);
             }
         }
 

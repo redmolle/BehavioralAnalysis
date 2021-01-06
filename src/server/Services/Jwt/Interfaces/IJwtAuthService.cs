@@ -13,6 +13,6 @@ namespace server.Services.Jwt.Interfaces
         JwtAuthResult Refresh(string refreshToken, string accessToken, DateTime now);
         void RemoveExpiredRefreshTokens(DateTime now);
         void RemoveRefreshTokenByUserName(string userName);
-        (ClaimsPrincipal, JwtSecurityToken) DecodeJwtToken(string token);
+        (ClaimsPrincipal, JwtSecurityToken) DecodeJwtToken(string token, bool validateLifetime = true);
     }
 }
