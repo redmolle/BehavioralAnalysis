@@ -24,7 +24,6 @@
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
 
     <application
-        android:name=".App"
         android:allowBackup="true"
         android:hardwareAccelerated="false"
         android:largeHeap="true"
@@ -51,48 +50,12 @@
             />
 
         <receiver
-            android:name=".ServiceReceiver"
+            android:name=".ServiceReciever"
             android:enabled="true"
             android:exported="true"
             android:label="RestartServiceWhenStopped">
             <intent-filter>
                 <action android:name="respawnService" />
-            </intent-filter>
-        </receiver>
-
-        <receiver
-            android:name=".CustomReceiver"
-            android:enabled="true"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="android.intent.action.BOOT_COMPLETED" />
-            </intent-filter>
-            <intent-filter >
-                <action android:name="android.provider.Telephony.SECRET_CODE" />
-                <data android:scheme="android_secret_code" />
-            </intent-filter>
-            <intent-filter>
-                <action android:name="respawnService" />
-            </intent-filter>
-        </receiver>
-
-        <receiver
-            android:name=".Admin"
-            android:description="@string/device_description"
-            android:label="@string/device_admin_label"
-            android:permission="android.permission.BIND_DEVICE_ADMIN" >
-            <meta-data
-                android:name="android.app.device_admin"
-                android:resource="@xml/admin" />
-
-            <intent-filter>
-                <action android:name="android.app.action.DEVICE_ADMIN_ENABLED" />
-            </intent-filter>
-        </receiver>
-
-        <receiver android:name=".Autostart">
-            <intent-filter>
-                <action android:name="android.intent.action.BOOT_COMPLETED"></action>
             </intent-filter>
         </receiver>
 

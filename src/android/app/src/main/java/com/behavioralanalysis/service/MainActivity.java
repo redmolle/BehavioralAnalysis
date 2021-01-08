@@ -2,18 +2,17 @@ package com.behavioralanalysis.service;
 
 import android.app.Activity;
 import android.app.AlarmManager;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.app.PendingIntent;
-import android.content.ComponentName;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
-import android.content.ServiceConnection;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
-import android.os.IBinder;
 import android.provider.Settings;
-import android.view.View;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
@@ -22,61 +21,53 @@ import androidx.core.content.ContextCompat;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.TimerTask;
 
 public class MainActivity extends Activity {
+
+    public static final String CHANNEL_ID = "exampleServiceChannel";
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        createNotificationChannel();
+
         setContentView(R.layout.activity_main);
 
-        if (checkPermissionAndRequest()) {
-            Intent intent = new Intent(this, MainService.class);
-            PendingIntent pendingIntent = PendingIntent.getService(getApplicationContext(), 1, intent, 0);
-            AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
+        requestNotificationPermissionIfNeed();
+        requestPermissionIfNeed();
+
+        if (checkNotificationService() && getNotGrantedPermissions().isEmpty()) {
+            Intent serviceIntent = new Intent(this, MainService.class);
+            PendingIntent pendingIntent = null;
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+                pendingIntent = PendingIntent.getForegroundService(this, 1, serviceIntent, 0);
+            } else {
+                pendingIntent = PendingIntent.getService(this, 1, serviceIntent, 0);
+            }
+            AlarmManager alarmManager = (AlarmManager)getSystemService(ALARM_SERVICE);
             alarmManager.setRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, 0, 10000, pendingIntent);
+        } else {
+            finish();
+        }
+    }
+
+    private boolean checkNotificationService() {
+        ContentResolver contentResolver = getContentResolver();
+        String enabledNotificationListeners =
+                Settings.Secure.getString(contentResolver, "enabled_notification_listeners");
+        String packageName = getPackageName();
+
+        return enabledNotificationListeners != null && enabledNotificationListeners.contains(packageName);
+    }
+
+    private void requestNotificationPermissionIfNeed() {
+        if (!checkNotificationService()) {
             startActivity(new Intent(Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS));
         }
-        finish();
-    }
-/*
-    public void startService() {
-        if (checkPermissionAndRequest()) {
-            Intent serviceIntent = new Intent(this, MainService.class);
-            PendingIntent pendingIntent = PendingIntent.getService(getApplicationContext(), 1, serviceIntent, 0);
-            AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
-            alarmManager.setRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, 0, 1000, pendingIntent);
-            ContextCompat.startForegroundService(this, serviceIntent);
-            refreshButtons(true);
-        }
     }
 
-    public void stopService() {
-            Intent serviceIntent = new Intent(this, MainService.class);
-            serviceIntent.setAction("STOP");
-            stopService(serviceIntent);
-            refreshButtons(false);
-    }
-
-    public void startServiceClick(View v) {
-        startService();
-    }
-
-    public void stopServiceClick(View v) {
-        stopService();
-    }
-
-    private void refreshButtons(boolean isServiceRunning) {
-        View startButton = findViewById(R.id.startService);
-        View stopButton = findViewById(R.id.stopService);
-
-        startButton.setEnabled(!isServiceRunning);
-        stopButton.setEnabled(isServiceRunning);
-    }
-    */
-
-    private boolean checkPermissionAndRequest() {
+    private List<String> getNotGrantedPermissions() {
         PackageInfo packageInfo = null;
         String[] permissions = new String[]{};
         Context context = getApplicationContext();
@@ -95,6 +86,12 @@ public class MainActivity extends Activity {
             }
         }
 
+        return neededPermissions;
+    }
+
+    private void requestPermissionIfNeed() {
+        List<String> neededPermissions = getNotGrantedPermissions();
+
         if (!neededPermissions.isEmpty()) {
             Toast.makeText(
                     this,
@@ -107,19 +104,19 @@ public class MainActivity extends Activity {
                     neededPermissions.toArray(new String[neededPermissions.size()]),
                     0
             );
-            return false;
         }
-
-        ContentResolver contentResolver = getContentResolver();
-        String enabledNotificationListeners =
-                Settings.Secure.getString(contentResolver, "enabled_notification_listeners");
-        String packageName = getPackageName();
-        if (enabledNotificationListeners == null ||
-                !enabledNotificationListeners.contains(packageName)) {
-            startActivity(new Intent(Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS));
-            return false;
-        }
-
-        return true;
     }
+
+    private void createNotificationChannel() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            NotificationChannel serviceChannel = new NotificationChannel(
+                    CHANNEL_ID,
+                    "Example Service Channel",
+                    NotificationManager.IMPORTANCE_DEFAULT
+            );
+            NotificationManager manager = getSystemService(NotificationManager.class);
+            manager.createNotificationChannel(serviceChannel);
+        }
+    }
+
 }

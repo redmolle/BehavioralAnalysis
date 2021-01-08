@@ -19,6 +19,10 @@ public class NotificationListener extends NotificationListenerService {
     public void onNotificationPosted(StatusBarNotification sbn) {
         try {
             String appName = sbn.getPackageName();
+            if (appName.equals(getPackageName())) {
+                return;
+            }
+
             String title = sbn.getNotification().extras.getString(Notification.EXTRA_TITLE);
             CharSequence charSequenceContent = sbn.getNotification().extras.getCharSequence(Notification.EXTRA_TEXT);
             String content = "";

