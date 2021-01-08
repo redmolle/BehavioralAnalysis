@@ -6,7 +6,6 @@ namespace bas.Db
     {
         public static void Initialize(Context context)
         {
-            context.Database.EnsureDeleted();
             context.Database.EnsureCreated();
 
             var user = new User

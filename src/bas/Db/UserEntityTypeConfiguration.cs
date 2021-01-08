@@ -2,7 +2,7 @@
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using bas.Models;
 
-namespace bas.Db.EntityTypeConfiguration
+namespace bas.Db
 {
     public class UserEntityTypeConfiguration : IEntityTypeConfiguration<User>
     {

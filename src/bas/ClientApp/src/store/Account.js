@@ -11,7 +11,7 @@ export const ACTION_TYPES = {
 
 export const login = (data, onSuccess=undefined, onFail=undefined) => (dispatch) => {
 	axios
-		.post(url + "login", {username: data.userName, password: data.password})
+		.post(url + "login", { username: data.userName, password: SHA256(data.password).toString() })
 		.then((response) => {
 			dispatch({
 				type: ACTION_TYPES.LOGIN,

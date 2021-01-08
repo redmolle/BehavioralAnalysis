@@ -3,9 +3,9 @@ using Microsoft.EntityFrameworkCore.Design;
 using Microsoft.Extensions.Configuration;
 using System.IO;
 
-namespace bas.Db.Factory
+namespace bas.Db
 {
-    public class ContextFactory : IContextFactory, IDesignTimeDbContextFactory<Context>
+    public class ContextFactory : IDesignTimeDbContextFactory<Context>
     {
         public Context CreateDbContext()
         {
@@ -25,11 +25,8 @@ namespace bas.Db.Factory
                 .SetBasePath(Directory.GetCurrentDirectory())
                 .AddJsonFile("appsettings.json")
                 .Build();
-#if DEBUG
-            options.UseNpgsql(configuration.GetConnectionString($"Dev{Context.CONNECTION_SECTION_NAME}"));
-#else
+
             options.UseSqlServer(configuration.GetConnectionString(Context.CONNECTION_SECTION_NAME));
-#endif
         }
     }
 }

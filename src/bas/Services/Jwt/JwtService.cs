@@ -5,8 +5,10 @@ using System.Linq;
 using System.Security.Claims;
 using System.Text;
 using bas.Models;
-using bas.Db.Repository.RefreshToken;
 using Microsoft.Extensions.DependencyInjection;
+using bas.Db;
+using System.Security.Cryptography;
+using Microsoft.EntityFrameworkCore;
 
 namespace bas.Services.Jwt
 {
@@ -50,7 +52,36 @@ namespace bas.Services.Jwt
 
         public JwtAuthResult GenerateTokens(string username, Claim[] claims, DateTime now)
         {
-            throw new NotImplementedException();
+            var shouldAddAudienceClaim = string.IsNullOrWhiteSpace(claims?.FirstOrDefault(x => x.Type == JwtRegisteredClaimNames.Aud)?.Value);
+            var jwtToken = new JwtSecurityToken(
+                _jwtTokenConfig.Issuer,
+                shouldAddAudienceClaim ? _jwtTokenConfig.Audience : string.Empty,
+                claims,
+                expires: now.AddMinutes(_jwtTokenConfig.AccessTokenExpiration),
+                signingCredentials: new SigningCredentials(new SymmetricSecurityKey(_secret), SecurityAlgorithms.HmacSha256Signature));
+            var accessToken = new JwtSecurityTokenHandler().WriteToken(jwtToken);
+
+            RefreshToken refreshToken = null;
+
+            ExecWithContext(context =>
+            {
+                var user = context.User.FirstOrDefault(x => x.Name == username);
+                refreshToken = new RefreshToken
+                {
+                    User = user,
+                    TokenString = GenerateRefreshTokenString(),
+                    ExpireAt = now.AddMinutes(_jwtTokenConfig.RefreshTokenExpiration)
+                };
+                context.RefreshToken.Add(refreshToken);
+                context.SaveChanges();
+            });
+
+
+            return new JwtAuthResult
+            {
+                AccessToken = accessToken,
+                RefreshToken = refreshToken
+            };
         }
 
         public JwtAuthResult Refresh(string refreshToken, string accessToken, DateTime now)
@@ -63,27 +94,78 @@ namespace bas.Services.Jwt
 
             var userName = principal.Identity.Name;
 
-            using (var scope = _serviceScopeFactory.CreateScope())
+            RefreshToken existingRefreshToken = ExecWithContext<RefreshToken>(context =>
             {
-                var refreshTokenRepository = scope.ServiceProvider.GetRequiredService<IRefreshTokenRepository>();
-                var token = refreshTokenRepository.GetTokenOrNull(refreshToken);
+                return context.RefreshToken.Include(x => x.User).FirstOrDefault(x => x.TokenString == refreshToken);
+            });
 
-                if (token == null || token.User.Name != userName || token.ExpireAt < now)
-                {
-                    throw new SecurityTokenException("Invalid token");
-                }
-
-                return GenerateTokens(userName, principal.Claims.ToArray(), now);
+            if (existingRefreshToken == null)
+            {
+                throw new SecurityTokenException("Invalid token");
             }
+            if (existingRefreshToken.User.Name != userName || existingRefreshToken.ExpireAt < now)
+            {
+                throw new SecurityTokenException("Invalid token");
+            }
+
+            return GenerateTokens(userName, principal.Claims.ToArray(), now);
+        }
+
+        public void RemoveExpiredRefreshTokens(DateTime now)
+        {
+            ExecWithContext(context =>
+            {
+                var expiredTokens = context.RefreshToken.Where(x => x.ExpireAt < now).ToList();
+                foreach (var expiredToken in expiredTokens)
+                {
+                    expiredToken.Stopped = DateTime.Now;
+                }
+                context.SaveChanges();
+            });
         }
 
         public void RemoveRefreshTokenByUserName(string userName)
         {
+            ExecWithContext(context =>
+            {
+                var refreshTokens = context.RefreshToken.Where(x => x.User.Name == userName).ToList();
+
+                foreach (var refreshToken in refreshTokens)
+                {
+                    refreshToken.Stopped = DateTime.Now;
+                }
+                context.SaveChanges();
+            });
+        }
+
+        private delegate void ContextMethod(Context context);
+
+        private delegate T ContextMethod<T>(Context context);
+
+        private void ExecWithContext(ContextMethod method)
+        {
             using (var scope = _serviceScopeFactory.CreateScope())
             {
-                var refreshTokenRepository = scope.ServiceProvider.GetRequiredService<IRefreshTokenRepository>();
-                refreshTokenRepository.Remove(userName);
+                var context = scope.ServiceProvider.GetRequiredService<Context>();
+                method(context);
             }
+        }
+
+        private T ExecWithContext<T>(ContextMethod<T> method)
+        {
+            using (var scope = _serviceScopeFactory.CreateScope())
+            {
+                var context = scope.ServiceProvider.GetRequiredService<Context>();
+                return method(context);
+            }
+        }
+
+        private static string GenerateRefreshTokenString()
+        {
+            var randomNumber = new byte[32];
+            using var randomNumberGenerator = RandomNumberGenerator.Create();
+            randomNumberGenerator.GetBytes(randomNumber);
+            return Convert.ToBase64String(randomNumber);
         }
     }
 }

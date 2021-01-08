@@ -1,5 +1,4 @@
-﻿using bas.Db.EntityTypeConfiguration;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using bas.Models;
 
 namespace bas.Db

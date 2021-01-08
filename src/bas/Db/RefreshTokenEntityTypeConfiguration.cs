@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using bas.Models;
 using System;
 
-namespace bas.Db.EntityTypeConfiguration
+namespace bas.Db
 {
     public class RefreshTokenEntityTypeConfiguration : IEntityTypeConfiguration<RefreshToken>
     {

@@ -1,6 +1,4 @@
-﻿using bas.Db.Repository.RefreshToken;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
+﻿using Microsoft.Extensions.Hosting;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
@@ -9,13 +7,13 @@ namespace bas.Services.Jwt
 {
     public class JwtRefreshTokenCacheService : IHostedService, IDisposable
     {
-        public JwtRefreshTokenCacheService(IServiceProvider services)
+        public JwtRefreshTokenCacheService(IJwtService jwtAuthManager)
         {
-            _services = services;
+            _jwtAuthManager = jwtAuthManager;
         }
 
         private Timer _timer;
-        private readonly IServiceProvider _services;
+        private readonly IJwtService _jwtAuthManager;
 
         public void Dispose()
         {
@@ -36,12 +34,7 @@ namespace bas.Services.Jwt
 
         private void DoWork(object state)
         {
-            using (var scope = _services.CreateScope())
-            {
-                var refreshTokenRepository = scope.ServiceProvider.GetRequiredService<IRefreshTokenRepository>();
-
-                refreshTokenRepository.Remove(DateTime.Now);
-            }
+            _jwtAuthManager.RemoveExpiredRefreshTokens(DateTime.Now);
         }
     }
 }

@@ -10,6 +10,7 @@ namespace bas.Services.Jwt
         JwtAuthResult GenerateTokens(string username, Claim[] claims, DateTime now);
         JwtAuthResult Refresh(string refreshToken, string accessToken, DateTime now);
         void RemoveRefreshTokenByUserName(string userName);
+        void RemoveExpiredRefreshTokens(DateTime date);
         (ClaimsPrincipal, JwtSecurityToken) DecodeJwtToken(string token, bool validateLifetime = true);
     }
 }

@@ -1,45 +1,48 @@
-﻿using bas;
-using bas.Db.Repository.User;
+﻿using bas.Db;
 using bas.Models;
+using System.Linq;
 
 namespace bas.Services.User
 {
     public class UserService : IUserService
     {
-        public UserService(IUserRepository userRepository)
+        public UserService(Context context)
         {
-            _userRepository = userRepository;
+            _context = context;
         }
 
-        private readonly IUserRepository _userRepository;
+        private readonly Context _context;
 
         public string GetUserRole(string userName)
         {
-            var user = _userRepository.GetUserOrNull(userName);
+            var user = _context.User.FirstOrDefault(x => x.Name == userName);
 
             if (user == null)
             {
                 return string.Empty;
             }
 
-            return user.IsAdmin ? UserRole.Admin : UserRole.Basic;
+            return user.IsAdmin
+                ? UserRole.Admin
+                : UserRole.Basic;
         }
 
         public bool IsAnExistingUser(string userName)
-        { 
-            return _userRepository.GetUserOrNull(userName) != null;
+        {
+            return _context.User.Any(x => x.Name == userName);
         }
 
         public bool IsValidUserCredentials(string userName, string password)
         {
-            var user = _userRepository.GetUserOrNull(userName);
-
-            if (user == null)
+            if (string.IsNullOrWhiteSpace(userName) || string.IsNullOrWhiteSpace(password))
             {
                 return false;
             }
+            var user = _context.User.FirstOrDefault(x => x.Name == userName);
 
-            return user.Password == password;
+            return user == null
+                ? false
+                : user.Password == password;
         }
     }
 }

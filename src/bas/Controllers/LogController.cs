@@ -1,23 +1,26 @@
 ﻿using bas.Db;
 using bas.Models;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace bas.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class LoggerController : ControllerBase
+    public class LogController : ControllerBase
     {
-        public LoggerController(Context logContext)
+        public LogController(Context context)
         {
-            this.logContext = logContext;
+            _context = context;
         }
 
-        Context logContext = null;
+        private readonly Context _context = null;
 
         [HttpPost]
         public IActionResult Log([FromBody] LogRequest request)
@@ -30,9 +33,9 @@ namespace bas.Controllers
                 Value = JsonConvert.SerializeObject(request.Value)
             };
 
-            logContext.Log.Add(log);
+            _context.Log.Add(log);
 
-            logContext.SaveChanges();
+            _context.SaveChanges();
 
             return CreatedAtAction("Get", log.Id);
         }
@@ -40,16 +43,17 @@ namespace bas.Controllers
         [HttpGet]
         [Route("all")]
         [Authorize(Roles = UserRole.Admin)]
-        public IActionResult Get([FromBody]object request)
+        public IActionResult Get([FromBody] object request)
         {
-            var logs = logContext.Log.ToList();
-            return Ok(logs.Select(x => new LogResult
+            var logs = _context.Log.Select(x => new LogResult
             {
                 Id = x.Id.ToString(),
                 Created = x.Created,
                 Type = x.Type.ToString(),
                 Value = x.Value
-            }).ToList());
+            }).ToList();
+
+            return Ok(logs);
         }
     }
 }

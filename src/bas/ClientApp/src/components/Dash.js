@@ -82,6 +82,7 @@ const getComparator = (order, orderBy) => {
 };
 
 const stableSort = (array, comparator) => {
+	console.log(array)
 	const stabilizedThis = array.map((el, index) => [el, index]);
 	stabilizedThis.sort((a, b) => {
 		const order = comparator(a[0], b[0]);
@@ -263,8 +264,10 @@ const Dashboard = ({ classes, ...props }) => {
 									})}
 								</TableRow>
 							</TableHead>
+							{props.logList && props.logList.length > 0 &&
 							<TableBody>
-							{stableSort(props.logList, getComparator(order, orderBy))
+							{
+								stableSort(props.logList, getComparator(order, orderBy))
 								.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
 								.map((row, rindex) => {
 									return (
@@ -286,6 +289,7 @@ const Dashboard = ({ classes, ...props }) => {
 								</TableRow>
 							)}
 						</TableBody>
+							}
 						</Table>
 					</TableContainer>
 					<TablePagination

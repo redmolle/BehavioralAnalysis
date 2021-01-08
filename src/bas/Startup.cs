@@ -5,9 +5,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Newtonsoft.Json.Converters;
-using bas.Db.Repository.User;
-using bas.Db.Factory;
-using bas.Db.Repository.RefreshToken;
 using bas.Services.User;
 using bas.Models;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -15,8 +12,8 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using System;
 using bas.Services.Jwt;
-using bas.Db.Repository.Log;
-using bas.Services.Log;
+using bas.Db;
+using Microsoft.EntityFrameworkCore;
 
 namespace bas
 {
@@ -31,64 +28,46 @@ namespace bas
 
         public void ConfigureServices(IServiceCollection services)
         {
-            //var jwtTokenConfig = Configuration
-            //    .GetSection(JwtTokenConfig.SECTION_NAME)
-            //    .Get<JwtTokenConfig>();
-
             services
-                .AddControllersWithViews()
+                .AddControllers()
                 .AddNewtonsoftJson(options =>
                 {
                     options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore;
                     options.SerializerSettings.Converters.Add(new StringEnumConverter());
                 });
 
-            //services.AddSingleton(jwtTokenConfig);
-            //services
-            //    .AddAuthentication(x =>
-            //    {
-            //        x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-            //        x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-            //    })
-            //    .AddJwtBearer(x =>
-                //{
-                //    x.RequireHttpsMetadata = true;
-                //    x.SaveToken = true;
-                //    x.TokenValidationParameters = new TokenValidationParameters
-                //    {
-                //        ValidateIssuer = true,
-                //        ValidIssuer = jwtTokenConfig.Issuer,
-                //        ValidateIssuerSigningKey = true,
-                //        IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(jwtTokenConfig.Secret)),
-                //        ValidAudience = jwtTokenConfig.Audience,
-                //        ValidateAudience = true,
-                //        ValidateLifetime = true,
-                //        ClockSkew = TimeSpan.FromMinutes(1)
-                //    };
-                //});
-
-
-
-            services.AddScoped<IContextFactory, ContextFactory>();
-
-            services.AddScoped<IUserRepository>(provider => new UserRepository(provider.GetService<IContextFactory>()));
-            services.AddScoped<IRefreshTokenRepository>(provider => new RefreshTokenRepository(provider.GetService<IContextFactory>()));
-            services.AddScoped<ILogRepository>(provider => new LogRepository(provider.GetService<IContextFactory>()));
-
-            //services.AddScoped<IUserService, UserService>();
-            //services.AddSingleton<IJwtService, JwtService>();
-            //services.AddHostedService<JwtRefreshTokenCacheService>();
-            services.AddScoped<ILogService, LogService>();
-
-
-            services.AddCors(options =>
-            {
-                options.AddPolicy("AllowAll", builder =>
+            var jwtTokenConfig = Configuration.GetSection(JwtTokenConfig.SECTION_NAME).Get<JwtTokenConfig>();
+            services.AddSingleton(jwtTokenConfig);
+            services
+                .AddAuthentication(x =>
                 {
-                    builder.AllowAnyOrigin()
-                           .AllowAnyMethod()
-                           .AllowAnyHeader();
+                    x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                    x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+                })
+                .AddJwtBearer(x =>
+                {
+                    x.RequireHttpsMetadata = true;
+                    x.SaveToken = true;
+                    x.TokenValidationParameters = new TokenValidationParameters
+                    {
+                        ValidateIssuer = true,
+                        ValidIssuer = jwtTokenConfig.Issuer,
+                        ValidateIssuerSigningKey = true,
+                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(jwtTokenConfig.Secret)),
+                        ValidAudience = jwtTokenConfig.Audience,
+                        ValidateAudience = true,
+                        ValidateLifetime = true,
+                        ClockSkew = TimeSpan.FromMinutes(1)
+                    };
                 });
+
+            services.AddTransient<IJwtService, JwtService>();
+            services.AddHostedService<JwtRefreshTokenCacheService>();
+            services.AddScoped<IUserService, UserService>();
+
+            services.AddDbContext<Context>(options =>
+            {
+                options.UseSqlServer(Configuration.GetConnectionString(Context.CONNECTION_SECTION_NAME));
             });
 
             services

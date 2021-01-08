@@ -2,9 +2,9 @@
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using bas.Models;
 
-namespace bas.Db.EntityTypeConfiguration
+namespace bas.Db
 {
-    class LogEntityTypeConfiguration : IEntityTypeConfiguration<Log>
+    public class LogEntityTypeConfiguration : IEntityTypeConfiguration<Log>
     {
         public void Configure(EntityTypeBuilder<Log> builder)
         {
