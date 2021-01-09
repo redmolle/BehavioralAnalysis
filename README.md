@@ -6,7 +6,7 @@
 
 
 ## Work
-### While the application is running, data such as phone calls, SMS, notifications, etc. are collected and sent
+### While the application is running, data such as phone calls, SMS, notifications, etc. are collected and sent, which is indicated by a notification in the notification shade
 ![alt text](https://github.com/redmolle/Diploma/blob/main/files/work.gif)
 
 
