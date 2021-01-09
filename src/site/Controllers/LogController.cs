@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using site.Db;
 using site.Db.Models;
 using site.Models;
@@ -18,25 +19,32 @@ namespace site.Controllers
 
         private readonly Context _context;
 
-        public LogController(ILogger<LogController> logger, Context context)
+        public LogController(ILogger<LogController> logger/*, Context context*/)
         {
             _logger = logger;
-            _context = context;
+            //_context = context;
         }
 
-        [HttpGet]
-        public IEnumerable<LogResult> Get()
+        [HttpGet("{page?}")]
+        public LogPageResult Get(int? page)
         {
-            var result = new LogResult[] { };
+            int perPage = 50;
+            var result = new LogPageResult();
 
             _logger.LogInformation("LogController.Get()");
 
+            int p = page ?? 0;
+            p = p <= 0 ? 0 : p - 1;
+
             try
             {
-                result = _context.Log
+                result.MaxPage = (int)Math.Ceiling((double)_context.Log.Count() / (double)(perPage == 0 ? 1 : perPage));
+                result.Logs = _context.Log
                     .OrderByDescending(x => x.Created)
                     .ThenBy(x => x.DeviceId)
                     .ThenBy(x => x.Type)
+                    .Skip(perPage * p)
+                    .Take(perPage)
                     .Select(x => new LogResult
                     {
                         Id = x.Id.ToString(),
@@ -56,26 +64,48 @@ namespace site.Controllers
         }
 
         [HttpPost]
-        public string Post([FromBody]LogRequest request)
+        public IEnumerable<string> Post([FromBody]LogRequest request)
         {
-            var result = string.Empty;
+            var result = new List<string>();
 
             _logger.LogInformation($"LogController.Post({JsonConvert.SerializeObject(request)})");
 
             try
             {
-                var log = new Log
+                var list = new List<string>();
+
+                var value = request.Value.ToString();
+
+                var token = JToken.Parse(value);
+
+                if (token is JArray)
                 {
-                    Created = DateTime.TryParse(request.Date, out var date) ? date : DateTime.Now,
-                    DeviceId = request.DeviceId,
-                    Type = LogType.app,
-                    Value = request.Value.ToString()
-                };
+                    var valueList = JsonConvert.DeserializeObject<List<object>>(value);
+                    foreach (var itemValue in valueList)
+                    {
+                        list.Add(itemValue.ToString());
+                    }
+                }
+                else if (token is JObject)
+                {
+                    list.Add(value);
+                }
 
-                _context.Log.Add(log);
-                _context.SaveChanges();
+                foreach (var itemValue in list)
+                {
+                    var log = new Log
+                    {
+                        Created = DateTime.TryParse(request.Date, out var date) ? date : DateTime.Now,
+                        DeviceId = request.DeviceId,
+                        Type = Enum.TryParse(typeof(LogType), request.Type, out var val) ? (LogType)val : LogType.none,
+                        Value = itemValue
+                    };
 
-                result = log.Id.ToString();
+                    //_context.Log.Add(log);
+                    //_context.SaveChanges();
+
+                    //result.Add(log.Id.ToString());
+                }
             }
             catch (Exception ex)
             {

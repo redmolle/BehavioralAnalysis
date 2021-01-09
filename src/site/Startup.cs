@@ -32,11 +32,11 @@ namespace site
                     options.SerializerSettings.Converters.Add(new StringEnumConverter());
                 });
 
-            services.AddDbContext<Context>(options =>
-            {
-                options.UseSqlServer(Configuration.GetConnectionString(Context.CONNECTION_SECTION_NAME));
-            });
-            
+            //services.AddDbContext<Context>(options =>
+            //{
+            //    options.UseSqlServer(Configuration.GetConnectionString(Context.CONNECTION_SECTION_NAME));
+            //});
+
             // In production, the React files will be served from this directory
             services.AddSpaStaticFiles(configuration =>
             {
