@@ -19,10 +19,10 @@ namespace site.Controllers
 
         private readonly Context _context;
 
-        public LogController(ILogger<LogController> logger/*, Context context*/)
+        public LogController(ILogger<LogController> logger, Context context)
         {
             _logger = logger;
-            //_context = context;
+            _context = context;
         }
 
         [HttpGet("{page?}")]
@@ -101,10 +101,10 @@ namespace site.Controllers
                         Value = itemValue
                     };
 
-                    //_context.Log.Add(log);
-                    //_context.SaveChanges();
+                    _context.Log.Add(log);
+                    _context.SaveChanges();
 
-                    //result.Add(log.Id.ToString());
+                    result.Add(log.Id.ToString());
                 }
             }
             catch (Exception ex)

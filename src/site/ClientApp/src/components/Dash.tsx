@@ -8,16 +8,13 @@ import * as LogsStore from '../store/Logs';
 type DashProps =
     LogsStore.LogState
     & typeof LogsStore.actionCreators
-    & RouteComponentProps<{ page: string }>; // ... plus incoming routing parameters
-
+    & RouteComponentProps<{ page: string }>;
 
 class Dash extends React.PureComponent<DashProps> {
-    // This method is called when the component is first added to the document
     public componentDidMount() {
         this.ensureDataFetched();
     }
 
-    // This method is called when the route parameters change
     public componentDidUpdate() {
         this.ensureDataFetched();
     }
@@ -78,6 +75,6 @@ class Dash extends React.PureComponent<DashProps> {
 }
 
 export default connect(
-    (state: ApplicationState) => state.logs, // Selects which state properties are merged into the component's props
-    LogsStore.actionCreators // Selects which action creators are merged into the component's props
+    (state: ApplicationState) => state.logs,
+    LogsStore.actionCreators
 )(Dash as any);

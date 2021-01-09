@@ -15,15 +15,9 @@ namespace site.Db
 
         public DbSet<Log> Log { get; set; }
 
-        public DbSet<User> User { get; set; }
-
-        public DbSet<RefreshToken> RefreshToken { get; set; }
-
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             new LogEntityTypeConfiguration().Configure(modelBuilder.Entity<Log>());
-            new RefreshTokenEntityTypeConfiguration().Configure(modelBuilder.Entity<RefreshToken>());
-            new UserEntityTypeConfiguration().Configure(modelBuilder.Entity<User>());
         }
     }
 }

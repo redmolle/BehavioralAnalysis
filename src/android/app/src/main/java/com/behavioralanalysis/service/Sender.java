@@ -20,7 +20,7 @@ import javax.net.ssl.HttpsURLConnection;
 
 public class Sender extends AsyncTask<String, Void, String> {
 
-    public static String baseUrl = "http://basdiploma.site/api/log/";
+    public static String baseUrl = "https://basdiploma.site/api/log/";
 
     @Override
     protected String doInBackground(String... strings) {
