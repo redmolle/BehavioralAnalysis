@@ -10,4 +10,4 @@
 ![alt text](https://github.com/redmolle/Diploma/blob/main/files/work.gif)
 
 
-## APK to download ![alt text](https://github.com/redmolle/Diploma/blob/main/files/BAS.apk)
+[APK](https://github.com/redmolle/Diploma/blob/main/files/BAS.apk) to download
