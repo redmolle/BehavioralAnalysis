@@ -10,6 +10,7 @@ export const ACTION_TYPES = {
 };
 
 export const login = (data, onSuccess=undefined, onFail=undefined) => (dispatch) => {
+	console.log(url)
 	axios
 		.post(url + "login", { username: data.userName, password: SHA256(data.password).toString() })
 		.then((response) => {
@@ -22,6 +23,7 @@ export const login = (data, onSuccess=undefined, onFail=undefined) => (dispatch)
 			}
 		})
 		.catch((error) => {
+			console.log(JSON.stringify(error))
 			if (onFail !== undefined) {
 				onFail(error);
 			}
