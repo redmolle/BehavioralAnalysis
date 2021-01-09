@@ -1,21 +1,13 @@
 # Diploma
 
-## MainView
-![alt text](https://github.com/redmolle/Diploma/blob/main/files/img/view.jpg)
+## Installation
+### For the application to work, you must provide all the requested permissions, otherwise the service will repeatedly request permissions
+![alt text](https://github.com/redmolle/Diploma/blob/main/files/installation.gif)
 
 
-## Notification
-![alt text](https://github.com/redmolle/Diploma/blob/main/files/img/notification.jpg)
+## Work
+### While the application is running, data such as phone calls, SMS, notifications, etc. are collected and sent
+![alt text](https://github.com/redmolle/Diploma/blob/main/files/work.gif)
 
 
-## Processing alert
-![alt text](https://github.com/redmolle/Diploma/blob/main/files/img/calls_processing.jpg)
-
-
-## Sending alert
-![alt text](https://github.com/redmolle/Diploma/blob/main/files/img/apps_sending.jpg)
-
-
-## Processed alert
-![alt text](https://github.com/redmolle/Diploma/blob/main/files/img/apps_processed.jpg)
-
+## APK to download ![alt text](https://github.com/redmolle/Diploma/blob/main/files/BAS.apk)
