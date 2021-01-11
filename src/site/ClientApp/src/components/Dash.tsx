@@ -31,7 +31,10 @@ const Dash = (props: DashProps) => {
     const [filter, setFilter] = React.useState(props.match.params.filter && props.match.params.filter !== "" ? props.match.params.filter : "none");
 
     const move = (newPage: number, newFilter: string) => {
-        history.push(`/dash/${newPage}/${newFilter}`);
+        if (newFilter !== filter) {
+            newPage = 1;
+        }
+        history.push(`/dash/${newFilter}/${newPage}`);
         setPage(newPage);
         setFilter(newFilter);
     }
@@ -93,7 +96,7 @@ const Dash = (props: DashProps) => {
     }
 
     React.useEffect(() => {
-        props.requestLogs(page, filter);
+        props.requestLogs(page, filter === "default" ? "def" : filter);
     }, [page, filter]);
 
     return (
