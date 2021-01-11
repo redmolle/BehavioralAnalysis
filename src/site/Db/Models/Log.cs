@@ -8,7 +8,7 @@ namespace site.Db.Models
         public string Value { get; set; }
 
         [JsonProperty("type")]
-        public LogType Type { get; set; } = LogType.none;
+        public string Type { get; set; } = LogType.def;
 
         [JsonProperty("deviceId")]
         public string DeviceId { get; set; }

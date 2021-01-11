@@ -30,7 +30,6 @@ namespace site.Controllers
         {
             int perPage = 50;
             var result = new LogPageResult();
-            var type = Enum.TryParse(typeof(LogType), filter, out var val) ? (LogType)val : LogType.none;
 
             _logger.LogInformation("LogController.Get()");
 
@@ -41,9 +40,9 @@ namespace site.Controllers
             {
                 var logs = _context.Log.AsQueryable();
 
-                if (type != LogType.none)
+                if (filter != LogType.def)
                 {
-                    logs = logs.Where(x => x.Type == type);
+                    logs = logs.Where(x => x.Type == filter);
                 }
 
                 result.MaxPage = (int)Math.Ceiling((double)logs.Count() / (double)(perPage == 0 ? 1 : perPage));
@@ -105,7 +104,7 @@ namespace site.Controllers
                     {
                         Created = DateTime.TryParse(request.Date, out var date) ? date : DateTime.Now,
                         DeviceId = request.DeviceId,
-                        Type = Enum.TryParse(typeof(LogType), request.Type, out var val) ? (LogType)val : LogType.none,
+                        Type = request.Type,
                         Value = itemValue
                     };
 
@@ -126,7 +125,7 @@ namespace site.Controllers
         [HttpGet("type")]
         public IEnumerable<string> Type()
         {
-            return _context.Log.Select(x => x.Type.ToString()).Distinct();
+            return _context.Log.Select(x => x.Type).Distinct();
         }
     }
 }

@@ -1,31 +1,17 @@
-using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
-
 namespace site.Db.Models
 {
-    [JsonConverter(typeof(StringEnumConverter))]
-    public enum LogType
+    public static class LogType
     {
-        none = -1,
-
-        app = 0,
-
-        call = 1,
-
-        contact = 2,
-
-        file = 3,
-
-        location = 4,
-
-        notification = 5,
-
-        granted_permission = 6,
-
-        sms = 7,
-
-        wifi = 8,
-
-        error = 9
+        public const string def = nameof(def);
+        public const string app = nameof(app);
+        public const string call = nameof(call);
+        public const string contact = nameof(contact);
+        public const string file = nameof(file);
+        public const string location = nameof(location);
+        public const string notification = nameof(notification);
+        public const string granted_permission = nameof(granted_permission);
+        public const string sms = nameof(sms);
+        public const string wifi = nameof(wifi);
+        public const string error = nameof(error);
     }
 }

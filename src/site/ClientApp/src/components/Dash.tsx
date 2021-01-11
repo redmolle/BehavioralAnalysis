@@ -1,4 +1,5 @@
 import { push } from 'connected-react-router';
+import { ENOPROTOOPT } from 'constants';
 import * as React from 'react';
 import { connect } from 'react-redux';
 import { Redirect, RouteComponentProps, useLocation } from 'react-router';
@@ -12,7 +13,7 @@ type DashProps =
     & RouteComponentProps<{ filter: string, page: string }>;
 
 const filterOptions = [
-    { value: "none" },
+    { value: "def" },
     { value: "app" },
     { value: "call" },
     { value: "contact" },
@@ -45,7 +46,7 @@ const Dash = (props: DashProps) => {
             <div>
                 Filter: <select value={filter} onChange={handleChange}>
                     {filterOptions.map((option) => (
-                        <option value={option.value}>{option.value}</option>
+                        <option value={option.value}>{option.value === "def" ? "default" : option.value}</option>
                     ))}
                 </select>
             </div>

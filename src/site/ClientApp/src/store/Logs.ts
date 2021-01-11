@@ -54,7 +54,7 @@ export const actionCreators = {
     }
 };
 
-const unloadedState: LogState = { filter: "none", maxPage: 1, logs: [], isLoading: false };
+const unloadedState: LogState = { filter: "def", maxPage: 1, logs: [], isLoading: false };
 
 export const reducer: Reducer<LogState> = (state: LogState | undefined, incomingAction: Action): LogState => {
     if (state === undefined) {
