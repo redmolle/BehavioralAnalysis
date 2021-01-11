@@ -4,6 +4,7 @@ import { AppThunkAction } from '.';
 export interface LogState {
     isLoading: boolean;
     page?: number;
+    filter: string;
     maxPage: number;
     logs: Log[];
 }
@@ -24,11 +25,13 @@ export interface Log {
 interface RequestLogsAction {
     type: 'REQUEST_LOGS';
     page: number;
+    filter: string;
 }
 
 interface ReceiveLogsAction {
     type: 'RECEIVE_LOGS';
     page: number;
+    filter: string;
     maxPage: number;
     logs: Log[];
 }
@@ -36,24 +39,22 @@ interface ReceiveLogsAction {
 type KnownAction = RequestLogsAction | ReceiveLogsAction;
 
 export const actionCreators = {
-    requestLogs: (page: number): AppThunkAction<KnownAction> => (dispatch, getState) => {
+    requestLogs: (page: number, filter: string): AppThunkAction<KnownAction> => (dispatch, getState) => {
         const appState = getState();
-        if (appState && appState.logs && page !== appState.logs.page) {
-            fetch(`api/log/${page}`)
-                //.then(response => response.text())
-                //.then(text => console.log(text))
+        if (appState && appState.logs && (page !== appState.logs.page || filter !== appState.logs.filter)) {
+            fetch(`api/log/${page}?filter=${filter}`)
                 .then(response => response.json() as Promise<Response>)
                 .then(data => {
-                    dispatch({ type: 'RECEIVE_LOGS', page: page, maxPage: data.maxPage, logs: data.logs });
+                    dispatch({ type: 'RECEIVE_LOGS', page: page, maxPage: data.maxPage, logs: data.logs, filter: filter });
                 })
                 .catch(error => console.log(error));
 
-            dispatch({ type: 'REQUEST_LOGS', page: page });
+            dispatch({ type: 'REQUEST_LOGS', page: page, filter: filter });
         }
     }
 };
 
-const unloadedState: LogState = { maxPage: 1, logs: [], isLoading: false };
+const unloadedState: LogState = { filter: "none", maxPage: 1, logs: [], isLoading: false };
 
 export const reducer: Reducer<LogState> = (state: LogState | undefined, incomingAction: Action): LogState => {
     if (state === undefined) {
@@ -66,14 +67,14 @@ export const reducer: Reducer<LogState> = (state: LogState | undefined, incoming
             return {
                 ...state,
                 page: action.page,
+                filter: action.filter,
                 isLoading: true
             };
         case 'RECEIVE_LOGS':
-            console.log(action);
-
-            if (action.page === state.page) {
+            if (action.page === state.page && action.filter === state.filter) {
                 return {
                     page: action.page,
+                    filter: action.filter,
                     maxPage: action.maxPage,
                     logs: action.logs,
                     isLoading: false
