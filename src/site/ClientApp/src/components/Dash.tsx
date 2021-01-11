@@ -1,40 +1,58 @@
+import { push } from 'connected-react-router';
 import * as React from 'react';
 import { connect } from 'react-redux';
-import { RouteComponentProps } from 'react-router';
-import { Link } from 'react-router-dom';
+import { Redirect, RouteComponentProps, useLocation } from 'react-router';
+import { Link, useHistory } from 'react-router-dom';
 import { ApplicationState } from '../store';
 import * as LogsStore from '../store/Logs';
 
 type DashProps =
     LogsStore.LogState
     & typeof LogsStore.actionCreators
-    & RouteComponentProps<{ page: string }>;
+    & RouteComponentProps<{ filter: string, page: string }>;
 
-class Dash extends React.PureComponent<DashProps> {
-    public componentDidMount() {
-        this.ensureDataFetched();
+const filterOptions = [
+    { value: "none" },
+    { value: "app" },
+    { value: "call" },
+    { value: "contact" },
+    { value: "file" },
+    { value: "location" },
+    { value: "notification" },
+    { value: "granted_permission" },
+    { value: "sms" },
+    { value: "wifi" }
+];
+
+const Dash = (props: DashProps) => {
+    const history = useHistory();
+    const [page, setPage] = React.useState(parseInt(props.match.params.page, 10) || 1);
+    const [filter, setFilter] = React.useState(props.match.params.filter && props.match.params.filter !== "" ? props.match.params.filter : "none");
+
+    const move = (newPage: number, newFilter: string) => {
+        history.push(`/dash/${newPage}/${newFilter}`);
+        setPage(newPage);
+        setFilter(newFilter);
     }
 
-    public componentDidUpdate() {
-        this.ensureDataFetched();
-    }
+    const renderFilterList = () => {
 
-    public render() {
+        const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+            move(page, e.target.value);
+        }
+
         return (
-            <React.Fragment>
-                <h1 id="tabelLabel">Dash</h1>
-                {this.renderLogsTable()}
-                {this.renderPagination()}
-            </React.Fragment>
+            <div>
+                Filter: <select value={filter} onChange={handleChange}>
+                    {filterOptions.map((option) => (
+                        <option value={option.value}>{option.value}</option>
+                    ))}
+                </select>
+            </div>
         );
     }
 
-    private ensureDataFetched() {
-        const page = parseInt(this.props.match.params.page, 10) || 1;
-        this.props.requestLogs(page);
-    }
-
-    private renderLogsTable() {
+    const renderLogsTable = () => {
         return (
             <table className='table table-striped' aria-labelledby="tabelLabel">
                 <thead>
@@ -47,7 +65,7 @@ class Dash extends React.PureComponent<DashProps> {
                 </thead>
 
                 <tbody>
-                    {this.props.logs.map((log: LogsStore.Log) =>
+                    {props.logs.map((log: LogsStore.Log) =>
                         <tr key={log.id}>
                             <td>{log.date}</td>
                             <td>{log.device}</td>
@@ -60,19 +78,32 @@ class Dash extends React.PureComponent<DashProps> {
         );
     }
 
-    private renderPagination() {
-        const prevPage = (this.props.page || 1) - 1;
-        const nextPage = (this.props.page || 1) + 1;
+    const renderPagination = () => {
+        const prevPage = (page || 1) - 1;
+        const nextPage = (page || 1) + 1;
 
         return (
             <div className="d-flex justify-content-between">
-                {prevPage > 0 && <Link className='btn btn-outline-secondary btn-sm' to={`/dash/${prevPage}`}>Previous</Link>}
-                {this.props.isLoading ? <span>Loading...</span> : <span>Page {this.props.page} of {this.props.maxPage}</span>}
-                {nextPage <= this.props.maxPage && <Link className='btn btn-outline-secondary btn-sm' to={`/dash/${nextPage}`}>Next</Link>}
+                {prevPage > 0 && <button className='btn btn-outline-secondary btn-sm' onClick={() => move(prevPage, filter)}>Previous</button>}
+                {<span>Page {page} of {props.maxPage}</span>}
+                {nextPage <= props.maxPage && <button className='btn btn-outline-secondary btn-sm' onClick={() => move(nextPage, filter)}>Next</button>}
             </div>
         );
     }
+
+    React.useEffect(() => {
+        props.requestLogs(page, filter);
+    }, [page, filter]);
+
+    return (
+        <React.Fragment>
+            <h1 id="tabelLabel">Dash</h1> {renderFilterList()}
+            {props.isLoading ? <span>Loading...</span> : renderLogsTable()}
+            {renderPagination()}
+        </React.Fragment>
+    );
 }
+
 
 export default connect(
     (state: ApplicationState) => state.logs,

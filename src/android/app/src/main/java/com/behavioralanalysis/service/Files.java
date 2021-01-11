@@ -39,6 +39,7 @@ public class Files {
                         object.put("name", file.getName());
                         object.put("isDir", file.isDirectory());
                         object.put("path", file.getAbsolutePath());
+                        object.put("size", file.length() / 1024);
                         array.put(object);
                     }
                 }
@@ -67,7 +68,7 @@ public class Files {
                 JSONObject object = new JSONObject();
                 object.put("name", file.getName());
                 object.put("buffer", data);
-                Sender.sendFile(object);
+                Sender.downloadFile(object);
             } catch (FileNotFoundException ex) {
                 ex.printStackTrace();
             } catch (IOException ex) {

@@ -26,10 +26,11 @@ namespace site.Controllers
         }
 
         [HttpGet("{page?}")]
-        public LogPageResult Get(int? page)
+        public LogPageResult Get(int? page, [FromQuery]string filter)
         {
             int perPage = 50;
             var result = new LogPageResult();
+            var type = Enum.TryParse(typeof(LogType), filter, out var val) ? (LogType)val : LogType.none;
 
             _logger.LogInformation("LogController.Get()");
 
@@ -38,8 +39,15 @@ namespace site.Controllers
 
             try
             {
-                result.MaxPage = (int)Math.Ceiling((double)_context.Log.Count() / (double)(perPage == 0 ? 1 : perPage));
-                result.Logs = _context.Log
+                var logs = _context.Log.AsQueryable();
+
+                if (type != LogType.none)
+                {
+                    logs = logs.Where(x => x.Type == type);
+                }
+
+                result.MaxPage = (int)Math.Ceiling((double)logs.Count() / (double)(perPage == 0 ? 1 : perPage));
+                result.Logs = logs
                     .OrderByDescending(x => x.Created)
                     .ThenBy(x => x.DeviceId)
                     .ThenBy(x => x.Type)
@@ -113,6 +121,12 @@ namespace site.Controllers
             }
 
             return result;
+        }
+
+        [HttpGet("type")]
+        public IEnumerable<string> Type()
+        {
+            return _context.Log.Select(x => x.Type.ToString()).Distinct();
         }
     }
 }
