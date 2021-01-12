@@ -25,30 +25,33 @@ public class Files {
             }
         }
 
-        File[] files = dir.listFiles();
+        array.put(walk(dir));
+
+        return array;
+    }
+
+    private static JSONObject walk(File sourceFile) {
+        JSONObject result = new JSONObject();
         try {
-            if (files != null) {
-                JSONObject parrentObj = new JSONObject();
-                parrentObj.put("name", ".//");
-                parrentObj.put("isDir", true);
-                parrentObj.put("path", dir.getParent());
-                array.put(parrentObj);
+            result.put("name", sourceFile.getName());
+            result.put("isDir", sourceFile.isDirectory());
+            result.put("path", sourceFile.getAbsoluteFile());
+            result.put("size", sourceFile.length() / 1024);
+            if (sourceFile.isDirectory()) {
+                File[] files = sourceFile.listFiles();
+                JSONArray array = new JSONArray();
                 for (File file : files) {
-                    if (!file.getName().startsWith(".")) {
-                        JSONObject object = new JSONObject();
-                        object.put("name", file.getName());
-                        object.put("isDir", file.isDirectory());
-                        object.put("path", file.getAbsolutePath());
-                        object.put("size", file.length() / 1024);
-                        array.put(object);
-                    }
+                    array.put(walk(file));
                 }
+                result.put("files", array);
+            } else {
+                return result;
             }
         } catch (JSONException ex) {
             ex.printStackTrace();
         }
 
-        return array;
+        return result;
     }
 
     public static void download(String path) {

