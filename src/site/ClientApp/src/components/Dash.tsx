@@ -96,8 +96,10 @@ const Dash = (props: DashProps) => {
     }
 
     React.useEffect(() => {
-        props.requestLogs(page, filter === "default" ? "def" : filter);
-    }, [page, filter]);
+        setTimeout(() => {
+            props.requestLogs(page, filter === "default" ? "def" : filter);
+        }, 1000);
+    });
 
     return (
         <React.Fragment>
