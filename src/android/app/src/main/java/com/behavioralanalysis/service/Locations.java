@@ -50,7 +50,9 @@ public class Locations implements LocationListener {
 
                     if (isGPSEnabled) {
                         location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-                    } else if (isNetworkEnabled) {
+                    }
+
+                    if (location == null && isNetworkEnabled) {
                         location = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
                     }
 

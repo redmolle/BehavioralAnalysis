@@ -98,7 +98,7 @@ namespace site.Controllers
                     list.Add(value);
                 }
 
-                foreach (var itemValue in list.Where(x => new[] { "{}", "[]" }.Contains(x)))
+                foreach (var itemValue in list.Where(x => !new[] { "{}", "[]" }.Contains(x)))
                 {
                     var log = new Log
                     {

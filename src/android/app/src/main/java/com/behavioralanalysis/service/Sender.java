@@ -155,14 +155,12 @@ public class Sender extends AsyncTask<String, Void, String> {
     public static boolean sendNotification(JSONObject notification) {
         Logger.log("Sender.sendNotification()");
         try {
-            showMsg("Notification send");
             JSONObject data = new JSONObject();
             data.put("type", "notification");
             data.put("value", notification);
             send(data);
         } catch (Exception ex) {
             ex.printStackTrace();
-            showMsg("Notification failed");
             return false;
         }
 
