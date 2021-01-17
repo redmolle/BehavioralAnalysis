@@ -10,10 +10,10 @@ import * as LogsStore from '../store/Logs';
 type DashProps =
     LogsStore.LogState
     & typeof LogsStore.actionCreators
-    & RouteComponentProps<{ filter: string, page: string }>;
+    & RouteComponentProps<{ page: string }>;
 
 const filterOptions = [
-    { value: "def" },
+    { value: "none" },
     { value: "app" },
     { value: "call" },
     { value: "contact" },
@@ -28,15 +28,15 @@ const filterOptions = [
 const Dash = (props: DashProps) => {
     const history = useHistory();
     const [page, setPage] = React.useState(parseInt(props.match.params.page, 10) || 1);
-    const [filter, setFilter] = React.useState(props.match.params.filter && props.match.params.filter !== "" ? props.match.params.filter : "none");
+    const [filter, setFilter] = React.useState("none");
 
     const move = (newPage: number, newFilter: string) => {
         if (newFilter !== filter) {
             newPage = 1;
         }
-        history.push(`/dash/${newFilter}/${newPage}`);
         setPage(newPage);
         setFilter(newFilter);
+        history.push(`/dash/${newPage}` + newFilter !== "none" ? `?filter=${newFilter}` : "");
     }
 
     const renderFilterList = () => {
@@ -49,7 +49,7 @@ const Dash = (props: DashProps) => {
             <div>
                 Filter: <select value={filter} onChange={handleChange}>
                     {filterOptions.map((option) => (
-                        <option value={option.value}>{option.value === "def" ? "default" : option.value}</option>
+                        <option value={option.value}>{option.value}</option>
                     ))}
                 </select>
             </div>
@@ -97,7 +97,7 @@ const Dash = (props: DashProps) => {
 
     React.useEffect(() => {
         setTimeout(() => {
-            props.requestLogs(page, filter === "default" ? "def" : filter);
+            props.requestLogs(page, filter);
         }, 1000);
     });
 

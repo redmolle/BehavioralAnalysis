@@ -11,10 +11,6 @@ import java.util.Date;
 
 public class Logger {
     public static void log(String message) {
-        log("info", message);
-    }
-
-    public static void log(String type, String message) {
         Context context = MainService.getContext();
         if (context == null) {
             return;
@@ -43,7 +39,7 @@ public class Logger {
             ).toString();
 
             BufferedWriter buf = new BufferedWriter(new FileWriter(logFile, true));
-            buf.append("[" + currentDate + "] [" + type.toUpperCase() + "] : " + message);
+            buf.append("[" + currentDate + "]  :  " + message);
             buf.newLine();
             buf.close();
         } catch (IOException ex) {

@@ -2,7 +2,7 @@ namespace site.Db.Models
 {
     public static class LogType
     {
-        public const string def = nameof(def);
+        public const string none = nameof(none);
         public const string app = nameof(app);
         public const string call = nameof(call);
         public const string contact = nameof(contact);
