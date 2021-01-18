@@ -36,7 +36,7 @@ const Dash = (props: DashProps) => {
         }
         setPage(newPage);
         setFilter(newFilter);
-        history.push(`/dash/${newPage}` + newFilter !== "none" ? `?filter=${newFilter}` : "");
+        history.push(`/dash/${newPage}`);
     }
 
     const renderFilterList = () => {
@@ -61,6 +61,7 @@ const Dash = (props: DashProps) => {
             <table className='table table-striped' aria-labelledby="tabelLabel">
                 <thead>
                     <tr>
+                        <th>Session</th>
                         <th>Date</th>
                         <th>Device</th>
                         <th>Type</th>
@@ -71,6 +72,7 @@ const Dash = (props: DashProps) => {
                 <tbody>
                     {props.logs.map((log: LogsStore.Log) =>
                         <tr key={log.id}>
+                            <td>{log.id}</td>
                             <td>{log.date}</td>
                             <td>{log.device}</td>
                             <td>{log.type}</td>

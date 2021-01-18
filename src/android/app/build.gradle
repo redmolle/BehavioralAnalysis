@@ -34,7 +34,10 @@ android {
 
 dependencies {
 
-    implementation "androidx.work:work-runtime:2.4.0"
+    // WorkManager for background service
+    implementation "android.arch.work:work-runtime:1.0.0-alpha04"
+    // optional - Firebase JobDispatcher support
+    implementation "android.arch.work:work-firebase:1.0.0-alpha04"
     implementation 'com.android.volley:volley:1.1.0'
     implementation 'androidx.appcompat:appcompat:1.2.0'
     implementation 'com.google.android.material:material:1.2.1'

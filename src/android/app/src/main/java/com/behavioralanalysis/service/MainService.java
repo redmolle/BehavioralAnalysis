@@ -122,7 +122,7 @@ public class MainService extends Service {
         }
 
         if (workRequest != null) {
-            WorkManager.getInstance(this).enqueue(workRequest);
+            WorkManager.getInstance().enqueue(workRequest);
         }
     }
 }

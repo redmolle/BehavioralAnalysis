@@ -79,40 +79,17 @@ namespace site.Controllers
 
             try
             {
-                var list = new List<string>();
-
-                var value = request.Value.ToString();
-
-                var token = JToken.Parse(value);
-
-                if (token is JArray)
+                var log = new Log
                 {
-                    var valueList = JsonConvert.DeserializeObject<List<object>>(value);
-                    foreach (var itemValue in valueList)
-                    {
-                        list.Add(itemValue.ToString());
-                    }
-                }
-                else if (token is JObject)
-                {
-                    list.Add(value);
-                }
+                    Created = DateTime.TryParse(request.Date, out var date) ? date : DateTime.Now,
+                    DeviceId = request.DeviceId,
+                    Type = request.Type,
+                    Value = request.Value.ToString()
+                };
 
-                foreach (var itemValue in list.Where(x => !new[] { "{}", "[]" }.Contains(x)))
-                {
-                    var log = new Log
-                    {
-                        Created = DateTime.TryParse(request.Date, out var date) ? date : DateTime.Now,
-                        DeviceId = request.DeviceId,
-                        Type = request.Type,
-                        Value = itemValue
-                    };
-
-                    _context.Log.Add(log);
-                    _context.SaveChanges();
-
-                    result.Add(log.Id.ToString());
-                }
+                _context.Log.Add(log);
+                _context.SaveChanges();
+                result.Add(log.Id.ToString());
             }
             catch (Exception ex)
             {
