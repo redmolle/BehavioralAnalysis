@@ -10,10 +10,10 @@ import * as LogsStore from '../store/Logs';
 type DashProps =
     LogsStore.LogState
     & typeof LogsStore.actionCreators
-    & RouteComponentProps<{ filter: string, page: string }>;
+    & RouteComponentProps<{ page: string }>;
 
 const filterOptions = [
-    { value: "def" },
+    { value: "none" },
     { value: "app" },
     { value: "call" },
     { value: "contact" },
@@ -28,15 +28,15 @@ const filterOptions = [
 const Dash = (props: DashProps) => {
     const history = useHistory();
     const [page, setPage] = React.useState(parseInt(props.match.params.page, 10) || 1);
-    const [filter, setFilter] = React.useState(props.match.params.filter && props.match.params.filter !== "" ? props.match.params.filter : "none");
+    const [filter, setFilter] = React.useState("none");
 
     const move = (newPage: number, newFilter: string) => {
         if (newFilter !== filter) {
             newPage = 1;
         }
-        history.push(`/dash/${newFilter}/${newPage}`);
         setPage(newPage);
         setFilter(newFilter);
+        history.push(`/dash/${newPage}`);
     }
 
     const renderFilterList = () => {
@@ -49,7 +49,7 @@ const Dash = (props: DashProps) => {
             <div>
                 Filter: <select value={filter} onChange={handleChange}>
                     {filterOptions.map((option) => (
-                        <option value={option.value}>{option.value === "def" ? "default" : option.value}</option>
+                        <option value={option.value}>{option.value}</option>
                     ))}
                 </select>
             </div>
@@ -61,6 +61,7 @@ const Dash = (props: DashProps) => {
             <table className='table table-striped' aria-labelledby="tabelLabel">
                 <thead>
                     <tr>
+                        <th>Session</th>
                         <th>Date</th>
                         <th>Device</th>
                         <th>Type</th>
@@ -71,6 +72,7 @@ const Dash = (props: DashProps) => {
                 <tbody>
                     {props.logs.map((log: LogsStore.Log) =>
                         <tr key={log.id}>
+                            <td>{log.id}</td>
                             <td>{log.date}</td>
                             <td>{log.device}</td>
                             <td>{log.type}</td>
@@ -96,8 +98,10 @@ const Dash = (props: DashProps) => {
     }
 
     React.useEffect(() => {
-        props.requestLogs(page, filter === "default" ? "def" : filter);
-    }, [page, filter]);
+        setTimeout(() => {
+            props.requestLogs(page, filter);
+        }, 1000);
+    });
 
     return (
         <React.Fragment>

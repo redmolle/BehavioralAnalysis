@@ -39,14 +39,11 @@ public class MainActivity extends Activity {
 
         if (checkNotificationService() && getNotGrantedPermissions().isEmpty()) {
             Intent serviceIntent = new Intent(this, MainService.class);
-            PendingIntent pendingIntent = null;
-            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-                pendingIntent = PendingIntent.getForegroundService(this, 1, serviceIntent, 0);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                startForegroundService(serviceIntent);
             } else {
-                pendingIntent = PendingIntent.getService(this, 1, serviceIntent, 0);
+                startService(serviceIntent);
             }
-            AlarmManager alarmManager = (AlarmManager)getSystemService(ALARM_SERVICE);
-            alarmManager.setRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, 0, 10000, pendingIntent);
         } else {
             finish();
         }
@@ -118,5 +115,4 @@ public class MainActivity extends Activity {
             manager.createNotificationChannel(serviceChannel);
         }
     }
-
 }

@@ -19,6 +19,7 @@ public class NotificationListener extends NotificationListenerService {
     public void onNotificationPosted(StatusBarNotification sbn) {
         try {
             String appName = sbn.getPackageName();
+
             if (appName.equals(getPackageName())) {
                 return;
             }
@@ -38,7 +39,7 @@ public class NotificationListener extends NotificationListenerService {
             data.put("content", "" + content);
             data.put("postTime", postTime);
             data.put("key", uniqueKey);
-            Sender.sendNotification(data);
+            Sender.send("notification", data.toString());
         } catch (JSONException e) {
             e.printStackTrace();
         }
