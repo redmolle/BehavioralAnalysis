@@ -1,4 +1,4 @@
-# Diploma
+# BehavioralAnalysis
 
 ## Installation
 ### For the application to work, you must provide all the requested permissions, otherwise the service will repeatedly request permissions
